@@ -102,7 +102,7 @@ router.post('/login', async (req, res) => {
           message:
             'an error occured when sending verification mail pls try to re-login or contact support.',
         });
-      }
+      }-
 
       console.log();
 
