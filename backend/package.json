@@ -23,12 +23,16 @@
   "homepage": "https://github.com/georgesimos/nodejs-starter#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "chalk": "^3.0.0",
+    "cloudinary": "^1.37.3",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-fileupload": "^1.4.0",
     "express-status-monitor": "^1.2.7",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.8.3",
+    "mongoose": "^7.4.0",
     "morgan": "^1.9.1",
     "nodemailer": "^6.9.4"
   },

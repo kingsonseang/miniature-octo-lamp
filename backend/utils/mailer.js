@@ -1,9 +1,12 @@
+const dotenv = require('dotenv')
+dotenv.config()
+
 const mailer = require('nodemailer');
 
-const Transport = mailer.createTransport({
+const Transporter = mailer.createTransport({
   service: process.env.SMTP_PROVIDER,
   host: process.env.SMTP_PROVIDER_HOST_SERVER,
-  port: process.env.SMTP_PORT,
+  port: 2525,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASS,
@@ -13,7 +16,6 @@ const Transport = mailer.createTransport({
   },
 });
 
-
 async function SendMail(to, subject, text, html) {
     try {
         const options = {
@@ -21,9 +23,9 @@ async function SendMail(to, subject, text, html) {
             to:to,
             subject: subject,
             text: text,
-            html: html,
           };
-        await Transport(options)
+          console.log(options);
+        const mail = await Transporter.sendMail(options)
         return { sent: true }
     } catch (err) {
         return console.error(err)

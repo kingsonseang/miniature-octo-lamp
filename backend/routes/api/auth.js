@@ -9,13 +9,16 @@ const sendOtp = require('../../utils/sendOtp');
  * @desc    register a user
  * @access  Public
  */
+
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name, phone } = req.body;
-    const email_exist = await User.findByCredentials(email, password);
-    const phone_exist = await User.findByCredentials(email, password);
+
+    const email_exist = await User.findOne({email: email});
+    const phone_exist = await User.findOne({phone: phone});
 
     if (email_exist) {
+      console.log(email_exist);
       return res.status(409).send({
         error: { message: 'You have entered an email associated with another account.' },
       });
@@ -28,6 +31,7 @@ router.post('/register', async (req, res) => {
     }
 
     const user = new User(req.body);
+    console.log(user);
     await user.save();
 
     // Generate a 6-digit OTP
@@ -140,4 +144,5 @@ router.post('/logoutAll', auth, async (req, res) => {
     res.status(400).send(e);
   }
 });
+
 module.exports = router;

@@ -9,8 +9,8 @@ const userSchema = Schema(
     name: String,
     email: { type: String, unique: true },
     password: String,
-    email: { type: String, unique: true },
-    emailVerified: { type: Boolean, default: true },
+    phone: { type: String, unique: true },
+    emailVerified: { type: Boolean, default: false },
     role: {
       type: String,
       default: 'unverfied',
