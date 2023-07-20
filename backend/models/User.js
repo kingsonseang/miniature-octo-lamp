@@ -9,10 +9,12 @@ const userSchema = Schema(
     name: String,
     email: { type: String, unique: true },
     password: String,
+    email: { type: String, unique: true },
+    emailVerified: { type: Boolean, default: true },
     role: {
       type: String,
-      default: 'guest',
-      enum: ['guest', 'admin', 'superadmin'],
+      default: 'unverfied',
+      enum: ['unverfied', 'verified', 'admin', 'superadmin'],
     },
     tokens: [{ token: { type: String, required: true } }],
   },
@@ -52,7 +54,7 @@ userSchema.methods.toJSON = function() {
  */
 userSchema.methods.generateAuthToken = async function() {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '365d' });
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;

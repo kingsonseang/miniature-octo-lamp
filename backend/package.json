@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-starter",
+  "name": "miniature-octo-lamp",
   "version": "1.0.0",
-  "description": "Nodejs Starter - A boilerplate for Node.js web applications",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -29,7 +29,8 @@
     "express-status-monitor": "^1.2.7",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.3",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "nodemailer": "^6.9.4"
   },
   "devDependencies": {
     "eslint": "^6.1.0",
