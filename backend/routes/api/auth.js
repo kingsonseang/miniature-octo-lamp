@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const Otp = require('../../models/Otp');
 const auth = require('../../config/auth');
@@ -31,7 +32,6 @@ router.post('/register', async (req, res) => {
     }
 
     const user = new User(req.body);
-
 
     let num = generateOTP();
 
@@ -77,23 +77,22 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    console.log(email, password);
+
     const user = await User.findByCredentials(email, password);
-    const token = await user.generateAuthToken();
 
-    if (!user.emailVerified) {
+    if (!user?.emailVerified) {
       // Delete token if any
-      const oldToken = Otp.findByCredentials(user._id);
+      const oldToken = await Otp.deleteMany({ userId: user._id });
 
-      if (oldToken) {
-        await oldToken.Invalidate();
-      }
+      let num = generateOTP();
 
       // Generate a 6-digit OTP
-      const otp = new Otp({ userId: user._id, code: generateOTP(6) });
-      await otp.save();
+      const otp = new Otp({ userId: user._id, code: num });
 
       // Send the OTP as mail
-      const sendNewUserOtp = sendOtp(user?.email, otp?.code);
+      const sendNewUserOtp = await sendOtp(user?.email, otp?.code);
 
       if (!sendNewUserOtp?.sent) {
         return res.send({
@@ -104,8 +103,16 @@ router.post('/login', async (req, res) => {
             'an error occured when sending verification mail pls try to re-login or contact support.',
         });
       }
+
+      console.log();
+
+      await otp.save();
+      const token = await user.generateAuthToken();
+
       return res.send({ user, token });
     }
+
+    const token = await user.generateAuthToken();
 
     res.send({ user, token });
   } catch (e) {
