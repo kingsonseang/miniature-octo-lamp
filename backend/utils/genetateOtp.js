@@ -1,12 +1,7 @@
-const crypto = require('crypto');
+const randtoken = require('rand-token').generator();
 
-const generateOTP = (length) => {
-  const buffer = crypto.randomBytes(length);
-  let OTP = '';
-  for (let i = 0; i < length; i++) {
-    OTP += buffer[i].toString().padStart(2, '0');
-  }
-  return OTP;
-};
+function generateOTP() {
+  return randtoken.generate(6, '0123456789');
+}
 
 module.exports = generateOTP;

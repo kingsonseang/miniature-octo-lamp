@@ -17,12 +17,16 @@ const Transporter = mailer.createTransport({
 });
 
 async function SendMail(to, subject, text, html) {
+
+  console.log(to, subject, text, html);
+
     try {
         const options = {
             from: `${process.env.COMPANY} <${process.env.EMAIL}>`,
             to:to,
             subject: subject,
             text: text,
+            html: html
           };
           console.log(options);
         const mail = await Transporter.sendMail(options)

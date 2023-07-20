@@ -3,6 +3,7 @@ const User = require('../../models/User');
 const Otp = require('../../models/Otp');
 const auth = require('../../config/auth');
 const sendOtp = require('../../utils/sendOtp');
+const generateOTP = require('../../utils/genetateOtp');
 
 /**
  * @route   POST /auth/register
@@ -14,11 +15,10 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password, name, phone } = req.body;
 
-    const email_exist = await User.findOne({email: email});
-    const phone_exist = await User.findOne({phone: phone});
+    const email_exist = await User.findOne({ email: email });
+    const phone_exist = await User.findOne({ phone: phone });
 
     if (email_exist) {
-      console.log(email_exist);
       return res.status(409).send({
         error: { message: 'You have entered an email associated with another account.' },
       });
@@ -31,15 +31,15 @@ router.post('/register', async (req, res) => {
     }
 
     const user = new User(req.body);
-    console.log(user);
-    await user.save();
+
+
+    let num = generateOTP();
 
     // Generate a 6-digit OTP
-    const otp = new Otp({ userId: user._id, code: generateOTP(6) });
-    await otp.save();
+    const otp = new Otp({ userId: user._id, code: num });
 
     // Send the OTP as mail
-    const sendNewUserOtp = sendOtp(user?.email, otp?.code);
+    const sendNewUserOtp = await sendOtp(user?.email, otp?.code);
 
     if (!sendNewUserOtp?.sent) {
       return res.send({
@@ -51,6 +51,9 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    await otp.save();
+    await user.save();
+
     const token = await user.generateAuthToken();
 
     return res.send({
@@ -61,7 +64,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (e) {
     res.status(400).send({
-      error: { message: 'An error occured on the server' },
+      error: { message: 'An error occured on the server', error: e },
     });
   }
 });
@@ -82,7 +85,7 @@ router.post('/login', async (req, res) => {
       const oldToken = Otp.findByCredentials(user._id);
 
       if (oldToken) {
-        await oldToken.Invalidate()
+        await oldToken.Invalidate();
       }
 
       // Generate a 6-digit OTP
