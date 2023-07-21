@@ -102,9 +102,7 @@ router.post('/login', async (req, res) => {
           message:
             'an error occured when sending verification mail pls try to re-login or contact support.',
         });
-      }-
-
-      console.log();
+      }
 
       await otp.save();
       const token = await user.generateAuthToken();
@@ -117,7 +115,8 @@ router.post('/login', async (req, res) => {
     res.send({ user, token });
   } catch (e) {
     res.status(400).send({
-      error: { message: 'You have entered an invalid email or password' },
+      error: true,
+      message: 'You have entered an invalid email or password',
     });
   }
 });
@@ -153,6 +152,45 @@ router.post('/logoutAll', auth, async (req, res) => {
   } catch (e) {
     res.status(400).send(e);
   }
+});
+
+/**
+ * @route   POST /auth/reset/otp
+ * @desc    Send Otp to reset password
+ * @access  Public
+ */
+router.post('/reset/otp', async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findByEmail(email);
+
+  if (!user) {
+    return res.status(404).send({ error: true, message: 'Email not associated with an account!' });
+  }
+
+  // Delete token if any
+  const oldToken = await Otp.deleteMany({ userId: user._id });
+
+  let num = generateOTP();
+
+  // Generate a 6-digit OTP
+  const otp = new Otp({ userId: user._id, code: num });
+
+  // Send the OTP as mail
+  const sendNewUserOtp = await sendOtp(user?.email, otp?.code);
+
+  if (!sendNewUserOtp?.sent) {
+    return res.send({
+      user: true,
+      error: true,
+      token: false,
+      message:
+        'an error occured when sending verification mail pls try to re-login or contact support.',
+    });
+  }
+
+  await otp.save();
+  return res.status(200).send({ error: false, message: "Otp sent successfully" });
 });
 
 module.exports = router;

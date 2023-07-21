@@ -74,6 +74,18 @@ userSchema.statics.findByCredentials = async function(email, password) {
   return user;
 };
 
+/**
+ * Helper static method for finding user by email
+ */
+userSchema.statics.findByEmail = async function(email) {
+  const User = this;
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('Unable to find user');
+
+  return user;
+};
+
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
