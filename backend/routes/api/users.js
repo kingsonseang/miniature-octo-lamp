@@ -92,7 +92,7 @@ router.patch('/me', auth, async (req, res) => {
 router.patch('/:id', auth, async (req, res) => {
   const validationErrors = [];
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password', 'role'];
+  const allowedUpdates = ['name', 'email', 'password'];
   const isValidOperation = updates.every(update => {
     const isValid = allowedUpdates.includes(update);
     if (!isValid) validationErrors.push(update);
@@ -109,6 +109,12 @@ router.patch('/:id', auth, async (req, res) => {
     updates.forEach(update => {
       user[update] = req.body[update];
     });
+
+    // update user role if req is sent by admin or super admin
+    if ((req.user.role === 'admin', req.user.role === 'superadmin')) {
+      user['role'] === req.body['role'];
+    }
+
     await user.save();
 
     return res.send(user);
@@ -146,6 +152,31 @@ router.delete('/:id', auth, async (req, res) => {
   } catch (e) {
     return res.sendStatus(400);
   }
+});
+
+/**
+ * @route   Notification /users/set-push-token
+ * @desc    Create user device public id
+ * @access  Private
+ */
+router.post('/set-push-token', auth, async (req, res) => {
+  const {
+    body: { newPublicId },
+    user,
+    token,
+  } = req;
+
+  console.log(token, user, newPublicId)
+
+  user.publicIds = user.publicIds.filter(publicId => {
+    return publicId.relatedToken !== token;
+  });
+
+  user.publicIds.concat({ publicId: newPublicId, relatedToken: token });
+
+  await user.save()
+
+  res.status(201).send();
 });
 
 module.exports = router;

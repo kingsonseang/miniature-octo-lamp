@@ -6,7 +6,12 @@ const { Schema } = mongoose;
 
 const userSchema = Schema(
   {
-    name: String,
+    name: {
+      first: { type: String, required: true },
+      last: { type: String, required: true },
+      middle: String,
+      suffix: String,
+    },
     email: { type: String, unique: true },
     password: String,
     phone: { type: String, unique: true },
@@ -17,6 +22,12 @@ const userSchema = Schema(
       enum: ['unverfied', 'verified', 'admin', 'superadmin'],
     },
     tokens: [{ token: { type: String, required: true } }],
+    publicIds: [
+      {
+        publicId: { type: String, required: true },
+        relatedToken: { type: String, required: true },
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -54,7 +65,9 @@ userSchema.methods.toJSON = function() {
  */
 userSchema.methods.generateAuthToken = async function() {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '365d' });
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET, {
+    expiresIn: '365d',
+  });
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
@@ -84,7 +97,6 @@ userSchema.statics.findByEmail = async function(email) {
 
   return user;
 };
-
 
 const User = mongoose.model('User', userSchema);
 

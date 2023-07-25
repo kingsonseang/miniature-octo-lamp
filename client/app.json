@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "caf23fcc-2c6c-4986-8175-12b3d9cc1251"
+      }
+    },
+    "owner": "kingsonseang"
   }
 }

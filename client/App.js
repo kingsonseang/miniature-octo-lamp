@@ -1,20 +1,44 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import AuthProvider from "./context/AuthContext";
+import LoadingProvider from "./context/LoadingContext";
+import NetworkProvider from "./context/NetworkContext";
+import NotificationProvider from "./context/NotificationContext";
+import AppNavigator from "./screens/AppNavigator";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+} from "@expo-google-fonts/dev";
 
 export default function App() {
+  let [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Montserrat_400Regular,
+    Montserrat_500Medium,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <LoadingProvider>
+        <NetworkProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <AppNavigator />
+            </NotificationProvider>
+          </AuthProvider>
+        </NetworkProvider>
+      </LoadingProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
