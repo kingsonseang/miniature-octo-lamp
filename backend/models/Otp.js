@@ -21,7 +21,7 @@ const otpSchema = Schema(
  */
 otpSchema.statics.findByCredentials = async function(user_id) {
   const Otp = this;
-  const otp = await Otp.findOne({ user_id });
+  const otp = await Otp.findOne({ userId: user_id });
   if (!otp) throw new Error('Unable to find Otp');
 
   return otp;
@@ -35,7 +35,7 @@ otpSchema.methods.Invalidate = async function() {
     await this.deleteOne({ _id: this._id });
     console.log('OTP deleted successfully');
   } catch (error) {
-    console.error('Error deleting OTP:', error);
+    throw new Error('Error deleting OTP: ', error);
   }
 };
 

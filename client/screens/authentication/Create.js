@@ -30,7 +30,7 @@ export default function Create({ navigation }) {
 
   return (
     <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
-      <StatusBar style="dark" backgroundColor="#fff" />
+      <StatusBar style="dark" backgroundColor="#ffffff" />
       <SafeAreaView
         style={[
           styles.container,
@@ -54,7 +54,7 @@ export default function Create({ navigation }) {
           >
             <AntDesign name="arrowleft" size={24} color="black" />
           </Pressable>
-          <Text style={[styles.textmP, styles.fs20]}>Create an Account</Text>
+          <Text allowFontScalingstyle={[styles.textmP, styles.fs20]}>Create an Account</Text>
           <View style={styles.headerbtn} />
         </View>
 
@@ -70,7 +70,7 @@ export default function Create({ navigation }) {
         >
           {/* username input */}
           <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-            <Text style={[styles.fs14, styles.textmP]}>Username</Text>
+            <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Username</Text>
             <Pressable
               style={{
                 width: "100%",
@@ -91,7 +91,7 @@ export default function Create({ navigation }) {
                 color={!usernameErr ? "#000" : "red"}
               />
               <TextInput
-                caretColor="#000"
+                cursorColor="#000"
                 textAlignVertical="center"
                 underlineColorAndroid="transparent"
                 style={[
@@ -118,7 +118,7 @@ export default function Create({ navigation }) {
             <View
               style={{ gap: Dimensions.get("window").height * 0.012, flex: 1 }}
             >
-              <Text style={[styles.fs14, styles.textmP]}>First name</Text>
+              <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>First name</Text>
               <Pressable
                 style={{
                   width: "100%",
@@ -139,7 +139,7 @@ export default function Create({ navigation }) {
                   color={!firstnameErr ? "#000" : "red"}
                 />
                 <TextInput
-                  caretColor="#000"
+                  cursorColor="#000"
                   textAlignVertical="center"
                   underlineColorAndroid="transparent"
                   style={[
@@ -157,7 +157,7 @@ export default function Create({ navigation }) {
             <View
               style={{ gap: Dimensions.get("window").height * 0.012, flex: 1 }}
             >
-              <Text style={[styles.fs14, styles.textmP]}>Last name</Text>
+              <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Last name</Text>
               <Pressable
                 style={{
                   width: "100%",
@@ -178,7 +178,7 @@ export default function Create({ navigation }) {
                   color={!lastnameErr ? "#000" : "red"}
                 />
                 <TextInput
-                  caretColor="#000"
+                  cursorColor="#000"
                   textAlignVertical="center"
                   underlineColorAndroid="transparent"
                   style={[
@@ -196,7 +196,7 @@ export default function Create({ navigation }) {
 
           {/* email input */}
           <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-            <Text style={[styles.fs14, styles.textmP]}>Email Address</Text>
+            <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Email Address</Text>
             <Pressable
               style={{
                 width: "100%",
@@ -217,7 +217,7 @@ export default function Create({ navigation }) {
                 color={!emailErr ? "#000" : "red"}
               />
               <TextInput
-                caretColor="#000"
+                cursorColor="#000"
                 textAlignVertical="center"
                 underlineColorAndroid="transparent"
                 style={[
@@ -234,7 +234,7 @@ export default function Create({ navigation }) {
 
           {/* passwordInput */}
           <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-            <Text style={[styles.fs14, styles.textmP]}>Password</Text>
+            <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Password</Text>
             <Pressable
               style={{
                 width: "100%",
@@ -254,7 +254,7 @@ export default function Create({ navigation }) {
                 color={!passwordErr ? "#000" : "red"}
               />
               <TextInput
-                caretColor="#000"
+                cursorColor="#000"
                 textAlignVertical="center"
                 underlineColorAndroid="transparent"
                 style={[
@@ -289,11 +289,11 @@ export default function Create({ navigation }) {
               justifyContent: "space-between",
             }}
           >
-            <Text style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
+            <Text allowFontScalingstyle={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
               Already have an Account?
             </Text>
             <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={[styles.textmP, styles.fs12]}>Login</Text>
+              <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>Login</Text>
             </Pressable>
           </View>
 
@@ -307,18 +307,18 @@ export default function Create({ navigation }) {
             alignItems: "center",
           }}
         >
-          <Text style={[styles.textP, styles.fs12]}>
+          <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>
             By continuing, you agree to the
           </Text>
           <View style={styles.TnCContainer}>
             <Pressable onPress={() => Linking.openURL("https://google.com")}>
-              <Text style={[styles.textmP, styles.fs12]}>
+              <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>
                 Terms and Services
               </Text>
             </Pressable>
-            <Text style={[styles.textP, styles.fs12]}>&</Text>
+            <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>&</Text>
             <Pressable onPress={() => Linking.openURL("https://google.com")}>
-              <Text style={[styles.textmP, styles.fs12]}>Privacy Policy</Text>
+              <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>Privacy Policy</Text>
             </Pressable>
           </View>
         </View>

@@ -1,10 +1,10 @@
-import { Dimensions, Pressable, StyleSheet, Text } from 'react-native'
+import { ActivityIndicator, Dimensions, Pressable, StyleSheet, Text } from 'react-native'
 import React from 'react'
 
-export default function AuthButton({ disbaled, onpress, text }) {
+export default function AuthButton({ disbaled, onpress, text, loading }) {
   return (
-    <Pressable onPress={onpress} style={[styles.container,  disbaled === true ? { opacity: .7 } : { opacity: 1 }]}>
-      <Text style={styles.text}>{text}</Text>
+    <Pressable onPress={onpress} style={[styles.container,  disbaled === true ? { backgroundColor: "grey" } : { opacity: 1 }]}>
+      {loading ? <ActivityIndicator color="#fff" size="small"  /> : <Text allowFontScalingstyle={styles.text}>{text}</Text>}
     </Pressable>
   )
 }

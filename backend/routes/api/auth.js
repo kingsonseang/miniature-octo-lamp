@@ -15,24 +15,32 @@ const sendLoginEmail = require('../../utils/sendLoginEmail');
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name, phone } = req.body;
+    const { email, password, firstname, lastname, username, phone } = req.body;
 
     const email_exist = await User.findOne({ email: email });
     const phone_exist = await User.findOne({ phone: phone });
 
     if (email_exist) {
       return res.status(409).send({
-        error: { message: 'You have entered an email associated with another account.' },
+        error: true,
+        message: 'You have entered an email associated with another account.',
       });
     }
 
     if (phone_exist) {
       return res.status(409).send({
-        error: { message: 'You have entered a phone number associated with another account.' },
+        error: true,
+        message: 'You have entered a phone number associated with another account.',
       });
     }
 
-    const user = new User(req.body);
+    const user = new User({
+      email: email,
+      password: password,
+      name: { first: firstname, last: lastname },
+      username: username,
+      phone: phone,
+    });
 
     let num = generateOTP();
 
@@ -83,7 +91,15 @@ router.post('/login', async (req, res) => {
 
     const user = await User.findByCredentials(email, password);
 
-    if (!user?.emailVerified) {
+    if (!user) {
+      return res.send({
+        user: false,
+        error: true,
+        message: 'Email not associated with a Black Bento account!',
+      });
+    }
+
+    if (user?.emailVerified === false) {
       // Delete token if any
       const oldToken = await Otp.deleteMany({ userId: user._id });
 
@@ -99,32 +115,39 @@ router.post('/login', async (req, res) => {
         return res.send({
           user: true,
           error: true,
-          token: false,
+          emailVerified: false,
           message:
             'an error occured when sending verification mail pls try to re-login or contact support.',
         });
       }
 
       await otp.save();
-      return res.status(200).send();
+
+      return res.status(200).send({
+        user: true,
+        error: false,
+        emailVerified: false,
+        message: "An email has been sent to you, Please verify you email to continue"
+      });
     }
 
-    const sendUserLoginEmail = await sendLoginEmail(user, device)
+    const sendUserLoginEmail = await sendLoginEmail(user, device);
+
+    const token = await user.generateAuthToken();
 
     if (!sendUserLoginEmail?.sent) {
       return res.send({
         user: true,
         error: true,
-        token: false,
-        message:
-          'An error occured when sending login mail.',
+        token: token,
+        message: 'An error occured when sending login mail.',
       });
     }
 
-    const token = await user.generateAuthToken();
-
-    res.send({ user, token });
+    res.status(200).send({ user, token });
   } catch (e) {
+    console.log(e);
+
     res.status(400).send({
       error: true,
       message: 'You have entered an invalid email or password',
@@ -226,7 +249,9 @@ router.post('/reset', async (req, res) => {
   const currentOtp = await Otp.findByCredentials(user._id);
 
   if (!currentOtp) {
-    return res.status(404).send({ error: true, match: false, message: 'OTP not valid or expired!' });
+    return res
+      .status(404)
+      .send({ error: true, match: false, message: 'OTP not valid or expired!' });
   }
 
   if (currentOtp.code !== digits) {
@@ -273,12 +298,14 @@ router.post('/verify', async (req, res) => {
     return res.status(404).send({ error: true, match: false, message: 'Otp not Valid!' });
   }
 
+  user.emailVerified = true;
+  await user.save()
+
   const token = await user.generateAuthToken();
 
   return res.status(200).send({
     error: false,
-    token: token,
-    message: 'Password reset successful, you have been logged out on all other devices!',
+    token: token
   });
 });
 

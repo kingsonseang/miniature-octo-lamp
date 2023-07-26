@@ -1,5 +1,4 @@
 import React from "react";
-
 export const LoadingContext = React.createContext();
 
 const LoadingProvider = ({ children }) => {
@@ -8,7 +7,7 @@ const LoadingProvider = ({ children }) => {
 
   return (
     <LoadingContext.Provider value={{ isGlobalLoading, setGlobalLoading }}>
-      {children}
+        {children}
     </LoadingContext.Provider>
   );
 };

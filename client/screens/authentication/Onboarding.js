@@ -153,16 +153,16 @@ export default function Onboarding({ navigation }) {
           alignItems: "center",
         }}
       >
-        <Text style={[styles.textP, styles.fs12]}>
+        <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>
           By continuing, you agree to the
         </Text>
         <View style={styles.TnCContainer}>
           <Pressable onPress={()=>Linking.openURL("https://google.com")}>
-            <Text style={[styles.textmP, styles.fs12]}>Terms and Services</Text>
+            <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>Terms and Services</Text>
           </Pressable>
-          <Text style={[styles.textP, styles.fs12]}>&</Text>
+          <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>&</Text>
           <Pressable onPress={()=>Linking.openURL("https://google.com")}>
-            <Text style={[styles.textmP, styles.fs12]}>Privacy Policy</Text>
+            <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>Privacy Policy</Text>
           </Pressable>
         </View>
       </View>

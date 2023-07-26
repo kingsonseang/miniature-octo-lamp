@@ -13,6 +13,7 @@ import {
   SpaceGrotesk_400Regular,
   SpaceGrotesk_500Medium,
 } from "@expo-google-fonts/dev";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -30,14 +31,15 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <StatusBar style="light" backgroundColor="#000000" />
       <LoadingProvider>
-        <NetworkProvider>
+        {/* <NetworkProvider> */}
           <AuthProvider>
             <NotificationProvider>
               <AppNavigator />
             </NotificationProvider>
           </AuthProvider>
-        </NetworkProvider>
+        {/* </NetworkProvider> */}
       </LoadingProvider>
     </SafeAreaProvider>
   );

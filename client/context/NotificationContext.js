@@ -3,7 +3,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import expoPushTokens from "../utils/expoPushTokens";
 import { AuthContext } from "./AuthContext";
-import { NetworkContext } from "./NetworkContext";
+import NetInfo from "@react-native-community/netinfo";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,7 +23,6 @@ export const NotificationContext = React.createContext();
 
 const NotificationProvider = ({ children }) => {
   const { userToken, isAuthenticated } = useContext(AuthContext);
-  const { isConnected } = useContext(NetworkContext);
 
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -41,7 +40,8 @@ const NotificationProvider = ({ children }) => {
     }
 
     if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync({
@@ -66,7 +66,8 @@ const NotificationProvider = ({ children }) => {
   const getPushNotificationPermissions = async () => {
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") {
-      const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      const { status: newStatus } =
+        await Notifications.requestPermissionsAsync();
       if (newStatus !== "granted") {
         return;
       }
@@ -75,38 +76,44 @@ const NotificationProvider = ({ children }) => {
 
   const setupNotificationListeners = async () => {
     // check if user is authenticated
-    const authStatus = await isAuthenticated()
+    const authStatus = await isAuthenticated();
 
-    if (authStatus) {
-      console.log("Get the Expo push token and store it to the server")
-      // Get the Expo push token and store it to the server
-      try {
-        await registerForPushNotificationsAsync().then((token) =>
-        expoPushTokens.register(token, userToken)
-      );
-
-        // This listener is fired whenever a notification is received while the app is foregrounded
-        notificationListener.current = Notifications.addNotificationReceivedListener(
-          (notification) => {
-            console.log("--- notification received ---");
-            console.log(notification);
-            console.log("------");
-          }
-        );
-
-        // This listener is fired whenever a user taps on or interacts with a notification
-        // (works when app is foregrounded, backgrounded, or killed)
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(
-          (response) => {
-            console.log("--- notification tapped ---");
-            console.log(response);
-            console.log("------");
-          }
-        );
-      } catch (error) {
-        console.log("Error setting up notification listeners:", error);
+    await NetInfo.addEventListener(async (state) => {
+      if (state.isConnected !== true) {
+        return alert("App needs an internet connection to fetch your data");
       }
-    }
+
+      if (authStatus !== true && userToken) {
+        console.log("Get the Expo push token and store it to the server");
+        // Get the Expo push token and store it to the server
+        try {
+          await registerForPushNotificationsAsync().then((token) =>
+            expoPushTokens.register(token, userToken)
+          );
+
+          // This listener is fired whenever a notification is received while the app is foregrounded
+          notificationListener.current =
+            Notifications.addNotificationReceivedListener((notification) => {
+              console.log("--- notification received ---");
+              console.log(notification);
+              console.log("------");
+            });
+
+          // This listener is fired whenever a user taps on or interacts with a notification
+          // (works when app is foregrounded, backgrounded, or killed)
+          responseListener.current =
+            Notifications.addNotificationResponseReceivedListener(
+              (response) => {
+                console.log("--- notification tapped ---");
+                console.log(response);
+                console.log("------");
+              }
+            );
+        } catch (error) {
+          console.log("Error setting up notification listeners:", error);
+        }
+      }
+    });
   };
 
   const AppNotification = async (title, body, trigger) => {
@@ -117,14 +124,10 @@ const NotificationProvider = ({ children }) => {
       },
       trigger: trigger,
     });
-  }
+  };
 
   useEffect(() => {
     getPushNotificationPermissions();
-
-    if (!isConnected) {
-      return alert("App need an internet connection to fetch your data")
-    }
 
     setupNotificationListeners();
 

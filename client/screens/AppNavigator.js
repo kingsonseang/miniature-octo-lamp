@@ -8,7 +8,7 @@ export default function AppNavigator() {
   const { userToken } = useContext(AuthContext);
   return (
     <NavigationContainer>
-      {userToken === null || "" ? <Authentication /> : <AppScreens />}
+      {userToken === null || userToken === "" ? <Authentication /> : <AppScreens />}
     </NavigationContainer>
   );
 }
