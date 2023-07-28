@@ -15,7 +15,7 @@ import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import PillButton from "../../components/PillButton";
-import RecipeListItem from "../../components/RecipeListItem";
+import RecipeListItem, { RecipeListOtherItem } from "../../components/RecipeListItem";
 
 export default function Home({ navigation }) {
   const searchInputRef = useRef();
@@ -26,59 +26,65 @@ export default function Home({ navigation }) {
   const dataArray = [
     {
       _id: 1,
-      name: "Beetroot Quinoa Salad",
+      name: "Beetroot Quinoa Salad Dressing",
       cookTime: 30 * 60 * 1000, // 30 minutes converted to milliseconds
-      Views: 150,
-      image: "https://cleananddelicious.com/wp-content/uploads/2021/03/Quinoa.Beet_.Salad_.blog-11.jpg",
+      views: 150,
+      image:
+        "https://cleananddelicious.com/wp-content/uploads/2021/03/Quinoa.Beet_.Salad_.blog-11.jpg",
     },
     {
       _id: 2,
       name: "Pasta Carbonara",
       cookTime: 25 * 60 * 1000, // 25 minutes converted to milliseconds
-      Views: 200,
-      image: "https://s23209.pcdn.co/wp-content/uploads/2014/03/IMG_2622edit.jpg",
+      views: 200,
+      image:
+        "https://s23209.pcdn.co/wp-content/uploads/2014/03/IMG_2622edit.jpg",
     },
     // Add more data objects below
     {
       _id: 3,
       name: "Grilled Chicken",
       cookTime: 45 * 60 * 1000, // 45 minutes converted to milliseconds
-      Views: 180,
-      image: undefined,
+      views: 180,
+      image:
+        "https://www.themediterraneandish.com/wp-content/uploads/2020/07/grilled-whole-chicken-recipe-9-1024x1536.jpg",
     },
     {
       _id: 4,
       name: "Chocolate Brownies",
       cookTime: 40 * 60 * 1000, // 40 minutes converted to milliseconds
-      Views: 250,
-      image: undefined,
+      views: 250,
+      image:
+        "https://neighborfoodblog.com/wp-content/uploads/2020/05/easy-homemade-brownies-5-540x720.jpg",
     },
     {
       _id: 5,
       name: "Mushroom Soup",
       cookTime: 20 * 60 * 1000, // 20 minutes converted to milliseconds
-      Views: 300,
-      image: undefined,
+      views: 300,
+      image:
+        "https://www.cookingclassy.com/wp-content/uploads/2022/09/cream-of-mushroom-soup-2.jpg",
     },
     {
       _id: 6,
       name: "Spaghetti Bolognese",
       cookTime: 35 * 60 * 1000, // 35 minutes converted to milliseconds
-      Views: 220,
-      image: undefined,
+      views: 220,
+      image:
+        "https://pinchofnom.com/wp-content/uploads/2022/01/Veggie-Spaghetti-Bolognese-01.jpg",
     },
     {
       _id: 7,
       name: "Fruit Smoothie",
       cookTime: 10 * 60 * 1000, // 10 minutes converted to milliseconds
-      Views: 280,
-      image: undefined,
+      views: 280,
+      image:
+        "https://www.dinneratthezoo.com/wp-content/uploads/2018/05/frozen-fruit-smoothie-3.jpg",
     },
   ];
-  
 
   return (
-    <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
+    <View style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
       <StatusBar style="dark" backgroundColor="#ffffff" />
       <SafeAreaView
         style={{
@@ -215,44 +221,47 @@ export default function Home({ navigation }) {
                   gap: Dimensions.get("window").height * 0.014,
                 }}
               >
-                <Pressable onPress={()=>setgridView(false)}>
+                <Pressable onPress={() => setgridView(true)}>
                   <MaterialCommunityIcons
                     name="mirror-rectangle"
                     size={22}
                     color="black"
-                    style={gridView && { opacity: .4 }}
+                    style={!gridView && { opacity: 0.4 }}
                   />
                 </Pressable>
-                <Pressable onPress={()=>setgridView(true)}>
-                  <Feather name="grid" size={22} color="black" style={!gridView && { opacity: .4 }} />
+                <Pressable onPress={() => setgridView(false)}>
+                  <Feather
+                    name="grid"
+                    size={22}
+                    color="black"
+                    style={gridView && { opacity: 0.4 }}
+                  />
                 </Pressable>
               </View>
             </View>
 
             {/* content */}
-            <FlatList
+            <ScrollView
               showsHorizontalScrollIndicator={false}
-              horizontal
+              horizontal={gridView}
               bounces
               contentContainerStyle={{
                 gap: Dimensions.get("window").height * 0.02,
                 paddingHorizontal: Dimensions.get("window").width * 0.06,
+                paddingBottom: Dimensions.get("window").height * 0.02
               }}
-              data={dataArray}
-              renderItem={({ item, index }) => {
-                return (
-                  gridView ? <RecipeListItem
-                    key={index}
-                    selected={_selected === item._id}
-                    text={item.name}
-                    duration
-                  /> : <Text>not grid view</Text>
+            >
+              {dataArray.map((item) => {
+                return gridView ? (
+                  <RecipeListItem key={item._id} {...item} />
+                ) : (
+                  <RecipeListOtherItem key={item._id} {...item} />
                 );
-              }}
-            />
+              })}
+            </ScrollView>
           </View>
         </ScrollView>
       </SafeAreaView>
-    </Pressable>
+    </View>
   );
 }
