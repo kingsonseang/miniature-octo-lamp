@@ -1,9 +1,10 @@
 import AuthProvider from "./context/AuthContext";
 import LoadingProvider from "./context/LoadingContext";
-import NetworkProvider from "./context/NetworkContext";
+import BottomSheetProvider from "./context/BottomSheetContext";
 import NotificationProvider from "./context/NotificationContext";
 import AppNavigator from "./screens/AppNavigator";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as NavigationBar from "expo-navigation-bar";
 import {
   useFonts,
   Poppins_400Regular,
@@ -14,8 +15,13 @@ import {
   SpaceGrotesk_500Medium,
 } from "@expo-google-fonts/dev";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Platform } from "react-native";
 
 export default function App() {
+  NavigationBar.setPositionAsync("absolute");
+  Platform.OS === "android" ? NavigationBar.setBackgroundColorAsync("#ffffff00") : null
+
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -33,13 +39,15 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="light" backgroundColor="#000000" />
       <LoadingProvider>
-        {/* <NetworkProvider> */}
+        <BottomSheetProvider>
           <AuthProvider>
             <NotificationProvider>
-              <AppNavigator />
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <AppNavigator />
+              </GestureHandlerRootView>
             </NotificationProvider>
           </AuthProvider>
-        {/* </NetworkProvider> */}
+        </BottomSheetProvider>
       </LoadingProvider>
     </SafeAreaProvider>
   );

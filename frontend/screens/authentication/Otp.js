@@ -93,7 +93,7 @@ export default function Otp(props) {
           >
             <AntDesign name="arrowleft" size={24} color="black" />
           </Pressable>
-          <Text allowFontScalingstyle={[styles.textmP, styles.fs20]}>Verify</Text>
+          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>Verify</Text>
           <View style={styles.headerbtn} />
         </View>
 
@@ -101,7 +101,7 @@ export default function Otp(props) {
 
         {/* otp input */}
         <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-          <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>
+          <Text allowFontScaling style={[styles.textP, styles.fs12]}>
             An Otp has been sent to your mail, if you didn't recieve one please
             make sure to check your spam folder.
           </Text>
@@ -149,7 +149,7 @@ export default function Otp(props) {
             justifyContent: "flex-end",
           }}
         >
-          {/* <Text allowFontScalingstyle={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
+          {/* <Text allowFontScaling style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
           </Text> */}
           <Pressable onPress={onResendPress}>
             <Text

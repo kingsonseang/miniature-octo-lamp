@@ -67,6 +67,8 @@ export default function Login({ navigation }) {
     setLoading(true)
     const loggedIn = await Login(email.toLowerCase(), password)
 
+    console.log(loggedIn);
+
     if (!loggedIn) {
       setAuthButtonInvalid(false)
       setLoading(false)
@@ -125,7 +127,7 @@ export default function Login({ navigation }) {
           >
             <AntDesign name="arrowleft" size={24} color="black" />
           </Pressable>
-          <Text allowFontScalingstyle={[styles.textmP, styles.fs20]}>Login</Text>
+          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>Login</Text>
           <View style={styles.headerbtn} />
         </View>
 
@@ -133,7 +135,7 @@ export default function Login({ navigation }) {
 
         {/* email input */}
         <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-          <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Email Address</Text>
+          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>Email Address</Text>
           <Pressable
             style={{
               width: "100%",
@@ -171,12 +173,12 @@ export default function Login({ navigation }) {
               }}
             />
           </Pressable>
-          { emailErr && <Text allowFontScalingstyle={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Invalid email, expected e.g someone@example.com</Text> }
+          { emailErr && <Text allowFontScaling style={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Invalid email, expected e.g someone@example.com</Text> }
         </View>
 
         {/* passwordInput */}
         <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-          <Text allowFontScalingstyle={[styles.fs14, styles.textmP]}>Password</Text>
+          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>Password</Text>
           <Pressable
             style={{
               width: "100%",
@@ -217,7 +219,7 @@ export default function Login({ navigation }) {
               />
             </Pressable>
           </Pressable>
-          { passwordErr && <Text allowFontScalingstyle={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Password mst contain at least one small and capital Alphabet, one number and at least 6 charachters in lenght</Text> }
+          { passwordErr && <Text allowFontScaling style={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Password mst contain at least one small and capital Alphabet, one number and at least 6 charachters in lenght</Text> }
         </View>
 
         {/* accesibility */}
@@ -229,11 +231,11 @@ export default function Login({ navigation }) {
             justifyContent: "space-between",
           }}
         >
-          <Text allowFontScalingstyle={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
+          <Text allowFontScaling style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
             Forgot your password?
           </Text>
           <Pressable onPress={() => navigation.navigate("Create")}>
-            <Text allowFontScalingstyle={[styles.textmP, styles.fs12]}>Reset</Text>
+            <Text allowFontScaling style={[styles.textmP, styles.fs12]}>Reset</Text>
           </Pressable>
         </View>
 
@@ -242,7 +244,7 @@ export default function Login({ navigation }) {
 
         {/* Register an account */}
         <View>
-          <Text allowFontScalingstyle={[styles.textP, styles.fs12]}>
+          <Text allowFontScaling style={[styles.textP, styles.fs12]}>
             Don't have an account yet?{" "}
             <Text
               onPress={() => navigation.navigate("Create")}

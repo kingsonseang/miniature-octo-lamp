@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet, Platform } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   containerPadding: {
     paddingVertical: Dimensions.get("window").height * 0.02,
     paddingHorizontal: Dimensions.get("window").width * 0.06,
+    paddingTop: Platform.OS === "ios" ? 0 : undefined
   },
   header: {
     flexDirection: "row",

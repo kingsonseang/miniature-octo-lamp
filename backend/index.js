@@ -1,12 +1,3 @@
-/**
- *
- * Author:  George Simos - georgesimos.com
- *
- * License: Copyright (c) 2019 George Simos
- * @link https://github.com/georgesimos/nodejs-starter
- *
- */
-
 const express = require('express');
 const logger = require('morgan');
 const dotenv = require('dotenv');
@@ -27,6 +18,9 @@ connectDB();
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+var cors = require('cors');
+app.use(cors());
 
 app.disable('x-powered-by');
 app.use(expressStatusMonitor());

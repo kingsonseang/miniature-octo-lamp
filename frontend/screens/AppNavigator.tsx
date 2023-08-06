@@ -5,7 +5,7 @@ import Authentication from "./authentication";
 import AppScreens from "./app";
 
 export default function AppNavigator() {
-  const { userToken } = useContext(AuthContext);
+  const { userToken }: any = useContext(AuthContext);
   return (
     <NavigationContainer>
       {userToken === null || userToken === "" ? <Authentication /> : <AppScreens />}
