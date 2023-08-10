@@ -19,10 +19,13 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Platform } from "react-native";
 import SplashScreenStack from "./screens/SplashScreen";
+import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
-  Platform.OS === "android" ? NavigationBar.setPositionAsync("absolute") : null
-  Platform.OS === "android" ? NavigationBar.setBackgroundColorAsync("#ffffff00") : null
+  Platform.OS === "android" ? NavigationBar.setPositionAsync("absolute") : null;
+  Platform.OS === "android"
+    ? NavigationBar.setBackgroundColorAsync("#ffffff00")
+    : null;
 
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -44,11 +47,13 @@ export default function App() {
       <LoadingProvider>
         <BottomSheetProvider>
           <AuthProvider>
-            <NotificationProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <AppNavigator />
-              </GestureHandlerRootView>
-            </NotificationProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <NavigationContainer>
+                <NotificationProvider>
+                  <SplashScreenStack />
+                </NotificationProvider>
+              </NavigationContainer>
+            </GestureHandlerRootView>
           </AuthProvider>
         </BottomSheetProvider>
       </LoadingProvider>

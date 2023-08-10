@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Authentication from "./authentication";
@@ -14,3 +14,6 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
+
+
+export const AppNavigation = useNavigation();

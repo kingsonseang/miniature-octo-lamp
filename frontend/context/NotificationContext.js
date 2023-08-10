@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import expoPushTokens from "../utils/expoPushTokens";
 import { AuthContext } from "./AuthContext";
 import NetInfo from "@react-native-community/netinfo";
 import Constants from "expo-constants";
+import { useNavigation } from "@react-navigation/native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,6 +24,10 @@ Notifications.setNotificationHandler({
 export const NotificationContext = React.createContext();
 
 const NotificationProvider = ({ children }) => {
+  const [badgeCount, setBadgeCount] = useState(0);
+
+  const navigation = useNavigation();
+
   const { userToken, isAuthenticated } = useContext(AuthContext);
 
   const notificationListener = useRef();
@@ -49,11 +54,17 @@ const NotificationProvider = ({ children }) => {
           projectId: Constants.expoConfig.extra.eas.projectId,
         });
         finalStatus = status;
+        const currentBadgeCount = await Notifications.getBadgeCountAsync();
+        setBadgeCount(currentBadgeCount);
       }
       if (finalStatus !== "granted") {
         throw new Error("Failed to get push token for push notification!");
       }
-      token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig.extra.eas.projectId, })).data;
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: Constants.expoConfig.extra.eas.projectId,
+        })
+      ).data;
       console.log(token);
       console.log(Device.brand, Device.designName, Device.modelName);
     } else {
@@ -75,6 +86,18 @@ const NotificationProvider = ({ children }) => {
     }
   };
 
+  const incrementBadgeCount = async () => {
+    const newBadgeCount = badgeCount + 1;
+    setBadgeCount(newBadgeCount);
+    await Notifications.setBadgeCountAsync(newBadgeCount);
+  };
+
+  const decreaseBadgeCount = async () => {
+    const newBadgeCount = (badgeCount = 1 ? 0 : badgeCount - 1);
+    setBadgeCount(newBadgeCount);
+    await Notifications.setBadgeCountAsync(newBadgeCount);
+  };
+
   const setupNotificationListeners = async () => {
     // check if user is authenticated
     await NetInfo.addEventListener(async (state) => {
@@ -82,7 +105,7 @@ const NotificationProvider = ({ children }) => {
         return alert("App needs an internet connection to fetch your data");
       }
 
-      if (userToken) {
+      if (userToken !== null) {
         console.log("Get the Expo push token and store it to the server");
         // Get the Expo push token and store it to the server
         try {
@@ -96,6 +119,7 @@ const NotificationProvider = ({ children }) => {
               console.log("--- notification received ---");
               console.log(notification);
               console.log("------");
+              incrementBadgeCount();
             });
 
           // This listener is fired whenever a user taps on or interacts with a notification
@@ -103,11 +127,22 @@ const NotificationProvider = ({ children }) => {
           responseListener.current =
             Notifications.addNotificationResponseReceivedListener(
               (response) => {
-                console.log("--- notification tapped ---");
-                console.log(response);
-                console.log("------");
+                decreaseBadgeCount();
+
+                const screenToOpen =
+                  response.notification.request.content.data.screenToOpen;
+
+                if (screenToOpen) {
+                  navigation.navigate(screenToOpen);
+                }
               }
             );
+
+          // Listen for notification dismissal
+          responseListener.current =
+            Notifications.addNotificationDismissedListener(() => {
+              decreaseBadgeCount();
+            });
         } catch (error) {
           console.log("Error setting up notification listeners:", error);
         }

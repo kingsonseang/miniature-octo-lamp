@@ -151,14 +151,12 @@ router.post('/login', async (req, res) => {
     sendPushNotification([{ publicId: publicId }], {
       body: `Hi there, We missed you and your creative culinary skills, Great to have you back,\nLets get cooking 🍱`,
       title: `Welcome back ${user.name.first} 👋`,
-      subtitle: ``,
     });
 
     if (user.publicIds !== [] || user.publicIds !== null) {
       sendPushNotification(user.publicIds, {
         body: `Hi there, We Got a new sign in from your account on another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
         title: `New Sign in on a new device`,
-        subtitle: ``,
       });
     }
 

@@ -208,7 +208,6 @@ export default function Home({ navigation }: any) {
         `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(', ')}&diet=${diet.join(', ')}&intolerances=${allergens.join(', ')}`
       )
       .then((res) => {
-        console.log(res.data);
         setPageData(res.data?.results);
       });
   }
@@ -235,7 +234,6 @@ export default function Home({ navigation }: any) {
         `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(', ')}&diet=${diet.join(', ')}&intolerances=${allergens.join(', ')}`
       )
       .then((res) => {
-        console.log(res.data);
         setPageData(res.data?.results);
       });
     setLoading(false);
