@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Dimensions,
   Keyboard,
   Linking,
@@ -18,10 +19,27 @@ import { isValidEmail, isValidPassword } from "../../utils/validate";
 import { CommonActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 
+export default function Login(props: any) {
+  const {
+    navigation,
+    route: {
+      params
+    },
+  } = props;
 
-export default function Login({ navigation }) {
+  const authContext = useContext(AuthContext);
 
-  const { Login } = useContext(AuthContext)
+  if (!authContext) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="small" color="#000000" />
+      </View>
+    );
+  }
+
+  // resetPasswordEmail
+
+  const { Login } = authContext;
 
   const navigation1 = useNavigation();
 
@@ -34,88 +52,88 @@ export default function Login({ navigation }) {
     );
   };
 
-  const emailInputRef = useRef();
+  const emailInputRef = useRef<TextInput | null>(null);
   const [emailErr, setEmailErr] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(params?.resetPasswordEmail ? params.resetPasswordEmail : "");
   const [obscure, setObscure] = useState(true);
-  const passwordInputRef = useRef();
+  const passwordInputRef = useRef<TextInput | null>(null);
   const [password, setPassword] = useState("");
   const [passwordErr, setPasswordErr] = useState(false);
-  const [authButtonInvalid, setAuthButtonInvalid] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [authButtonInvalid, setAuthButtonInvalid] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleOnPress = async () => {
-
     if (loading == true) {
-      return
+      return;
     }
 
-    setAuthButtonInvalid(true)
+    setAuthButtonInvalid(true);
 
     if (!email || !email.trim()) {
-      setAuthButtonInvalid(false)
-      emailInputRef.current.focus()
-      return
+      setAuthButtonInvalid(false);
+      emailInputRef?.current?.focus();
+      return;
     }
 
     if (!password || !password.trim()) {
-      setAuthButtonInvalid(false)
-      passwordInputRef.current.focus()
-      return
+      setAuthButtonInvalid(false);
+      passwordInputRef?.current?.focus();
+      return;
     }
 
     if (!isValidEmail(email)) {
-      setAuthButtonInvalid(false)
-      emailInputRef.current.focus()
-      setEmailErr(true)
-      return
+      setAuthButtonInvalid(false);
+      emailInputRef?.current?.focus();
+      setEmailErr(true);
+      return;
     }
 
     if (!isValidPassword(password)) {
-      setAuthButtonInvalid(false)
-      passwordInputRef.current.focus()
-      setPasswordErr(true)
-      return
+      setAuthButtonInvalid(false);
+      passwordInputRef?.current?.focus();
+      setPasswordErr(true);
+      return;
     }
 
-    setLoading(true)
-    const loggedIn = await Login(email.toLowerCase(), password)
+    setLoading(true);
+    const loggedIn = await Login(email.toLowerCase(), password);
 
     console.log(loggedIn);
 
     if (!loggedIn) {
-      setAuthButtonInvalid(false)
-      setLoading(false)
-      setAuthButtonInvalid(false)
-      return 
+      setAuthButtonInvalid(false);
+      setLoading(false);
+      setAuthButtonInvalid(false);
+      return;
     }
 
+    if (loggedIn && typeof loggedIn !== "boolean") {
+      if (loggedIn?.error === true && loggedIn?.emailVerified === false) {
+        setAuthButtonInvalid(false);
+        setLoading(false);
+        setAuthButtonInvalid(!loggedIn?.error);
+        return;
+      }
 
-    if (loggedIn?.error === true && loggedIn?.emailVerified === false) {
-      setAuthButtonInvalid(false)
-      setLoading(false)
-      setAuthButtonInvalid(!loggedIn?.error)
-      return 
-    }
+      if (loggedIn?.error === false && loggedIn?.emailVerified === false) {
+        setAuthButtonInvalid(false);
+        setLoading(false);
+        setAuthButtonInvalid(!loggedIn?.error);
 
-    if (loggedIn?.error === false && loggedIn?.emailVerified === false) {
-      setAuthButtonInvalid(false)
-      setLoading(false)
-      setAuthButtonInvalid(!loggedIn?.error)
+        // send user to otp page
+        return navigation.navigate("Otp", { email: email.toLowerCase() });
+      }
 
-      // send user to otp page
-      return navigation.navigate("Otp", { email: email.toLowerCase() })
-    }
-
-    if (loggedIn?.error) {
-      setAuthButtonInvalid(false)
-      setLoading(false)
-      setAuthButtonInvalid(!loggedIn?.error)
-      return
+      if (loggedIn?.error) {
+        setAuthButtonInvalid(false);
+        setLoading(false);
+        setAuthButtonInvalid(!loggedIn?.error);
+        return;
+      }
     }
 
     return goBackToInitialRoute();
-  }
+  };
 
   return (
     <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
@@ -143,7 +161,9 @@ export default function Login({ navigation }) {
           >
             <AntDesign name="arrowleft" size={24} color="black" />
           </Pressable>
-          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>Login</Text>
+          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>
+            Login
+          </Text>
           <View style={styles.headerbtn} />
         </View>
 
@@ -151,7 +171,9 @@ export default function Login({ navigation }) {
 
         {/* email input */}
         <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>Email Address</Text>
+          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>
+            Email Address
+          </Text>
           <Pressable
             style={{
               width: "100%",
@@ -164,7 +186,7 @@ export default function Login({ navigation }) {
               borderRadius: Dimensions.get("window").height * 0.018,
               borderColor: !emailErr ? "#000" : "red",
             }}
-            onPress={() => emailInputRef.current.focus()}
+            onPress={() => emailInputRef?.current?.focus()}
           >
             <Feather name="mail" size={24} color={!emailErr ? "#000" : "red"} />
             <TextInput
@@ -181,20 +203,32 @@ export default function Login({ navigation }) {
               autoComplete="email"
               onChangeText={(e) => setEmail(e.trim())}
               value={email}
-              onEndEditing={(e)=>{
+              onEndEditing={(e) => {
                 if (isValidEmail(e.nativeEvent.text.trim())) {
-                  setEmailErr(false)
-                  passwordInputRef.current.focus()
+                  setEmailErr(false);
+                  passwordInputRef?.current?.focus();
                 }
               }}
             />
           </Pressable>
-          { emailErr && <Text allowFontScaling style={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Invalid email, expected e.g someone@example.com</Text> }
+          {emailErr && (
+            <Text
+              allowFontScaling
+              style={[
+                styles.textP,
+                { color: "#f00000", opacity: 0.6, fontSize: 10 },
+              ]}
+            >
+              Invalid email, expected e.g someone@example.com
+            </Text>
+          )}
         </View>
 
         {/* passwordInput */}
         <View style={{ gap: Dimensions.get("window").height * 0.012 }}>
-          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>Password</Text>
+          <Text allowFontScaling style={[styles.fs14, styles.textmP]}>
+            Password
+          </Text>
           <Pressable
             style={{
               width: "100%",
@@ -206,7 +240,7 @@ export default function Login({ navigation }) {
               paddingHorizontal: Dimensions.get("window").height * 0.015,
               borderRadius: Dimensions.get("window").height * 0.018,
             }}
-            onPress={() => emailInputRef.current.focus()}
+            onPress={() => passwordInputRef?.current?.focus()}
           >
             <Feather name="lock" size={24} color="black" />
             <TextInput
@@ -223,7 +257,7 @@ export default function Login({ navigation }) {
               secureTextEntry={obscure}
               keyboardType={obscure ? "default" : "visible-password"}
               autoComplete="password"
-              onChangeText={(e) => setPassword(e)}
+              onChangeText={(e) => setPassword(e.trim())}
               value={password}
               // passwordRules="minlength:8; required: special; required: upper; required: lower; required: digit; no common;"
             />
@@ -235,7 +269,18 @@ export default function Login({ navigation }) {
               />
             </Pressable>
           </Pressable>
-          { passwordErr && <Text allowFontScaling style={[styles.textP, { color: "#f00000", opacity: .6, fontSize: 10 }]}>Password mst contain at least one small and capital Alphabet, one number and at least 6 charachters in lenght</Text> }
+          {passwordErr && (
+            <Text
+              allowFontScaling
+              style={[
+                styles.textP,
+                { color: "#f00000", opacity: 0.6, fontSize: 10 },
+              ]}
+            >
+              Password mst contain at least one small and capital Alphabet, one
+              number and at least 6 charachters in lenght
+            </Text>
+          )}
         </View>
 
         {/* accesibility */}
@@ -247,16 +292,26 @@ export default function Login({ navigation }) {
             justifyContent: "space-between",
           }}
         >
-          <Text allowFontScaling style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
+          <Text
+            allowFontScaling
+            style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}
+          >
             Forgot your password?
           </Text>
           <Pressable onPress={() => navigation.navigate("Reset")}>
-            <Text allowFontScaling style={[styles.textmP, styles.fs12]}>Reset</Text>
+            <Text allowFontScaling style={[styles.textmP, styles.fs12]}>
+              Reset
+            </Text>
           </Pressable>
         </View>
 
         {/* login btn */}
-        <AuthButton loading={loading} disbaled={authButtonInvalid} onpress={handleOnPress} text="Continue" />
+        <AuthButton
+          loading={loading}
+          disbaled={authButtonInvalid}
+          onpress={handleOnPress}
+          text="Continue"
+        />
 
         {/* Register an account */}
         <View>

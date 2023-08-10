@@ -53,6 +53,7 @@ type AuthContextType = {
   setDietList: any;
   category: string[];
   SendVerifyEmail: (email: string) => Promise<boolean | ApiResponse | undefined>;
+  ResetPassword: (email: string, otp: string | number, password: string) => Promise<boolean | ApiResponse | undefined>;
 };
 
 type ApiResponse = {
@@ -502,7 +503,29 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
 
       return true;
     } catch (error) {
-      console.error("Error verifying email:", error);
+      console.error("Error verifying email: ", error);
+      return false;
+    }
+  };
+
+  // send user email to verify with otp
+  const ResetPassword = async (email: string, otp: string | number, password: string) => {
+    try {
+      const response = await api.post<ApiResponse>("/auth/reset", {
+        email: email,
+        digits: otp,
+        newPassword: password,
+        device: Device,
+      });
+
+      if (!response.data) {
+        alert("An error occurred");
+        return undefined;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error resetting password: ", error);
       return false;
     }
   };
@@ -534,6 +557,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         preferenceRunner,
         uploadProfilePicture,
         SendVerifyEmail,
+        ResetPassword
       }}
     >
       {children}

@@ -5,6 +5,7 @@ import Login from "./Login";
 import Reset from "./Reset";
 import Otp from "./Otp";
 import Onboarding from "./Onboarding";
+import PasswordReset from "./PasswordReset";
 
 // create a stack navigator
 const Stack = createNativeStackNavigator();
@@ -22,6 +23,7 @@ export default function Authentication() {
       <Stack.Screen name="Create" component={Create} />
       <Stack.Screen name="Reset" component={Reset} />
       <Stack.Screen name="Otp" component={Otp} />
+      <Stack.Screen name="PasswordReset" component={PasswordReset} />
     </Stack.Navigator>
   );
 }

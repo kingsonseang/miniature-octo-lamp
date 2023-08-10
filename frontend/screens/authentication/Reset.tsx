@@ -1,12 +1,25 @@
-import { View, Text, Keyboard, Pressable, Dimensions, SafeAreaView, TextInput } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { View, Text, Keyboard, Pressable, Dimensions, SafeAreaView, TextInput, ActivityIndicator } from 'react-native'
+import React, { useContext, useRef, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import styles from './styles';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import AuthButton from '../../components/AuthButton';
 import { isValidEmail, isValidPassword } from "../../utils/validate";
+import { AuthContext } from '../../context/AuthContext';
 
 export default function Reset(props: any) {
+
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="small" color="#000000" />
+      </View>
+    );
+  }
+
+  const { SendVerifyEmail } = authContext
 
   const { navigation } = props
 
@@ -36,7 +49,17 @@ export default function Reset(props: any) {
       return
     }
 
+    setLoading(true)
+    const resendMailSent = await SendVerifyEmail(email.toLowerCase())
 
+    if (!resendMailSent) {
+      setAuthButtonInvalid(false)
+      setLoading(false)
+      setAuthButtonInvalid(false)
+      return 
+    }
+    setLoading(false)
+    return navigation.navigate("PasswordReset", { email: email.toLowerCase() })
   }
 
   return (
