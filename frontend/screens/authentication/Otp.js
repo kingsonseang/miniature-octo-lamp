@@ -14,11 +14,24 @@ import { AntDesign, Feather } from "@expo/vector-icons";
 import AuthButton from "../../components/AuthButton";
 import { StatusBar } from "expo-status-bar";
 import { AuthContext } from "../../context/AuthContext";
+import { CommonActions } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Otp(props) {
   const { navigation, route: { params } } = props;
 
   const { VerifyEmail } = useContext(AuthContext);
+
+  const navigation1 = useNavigation();
+
+  const goBackToInitialRoute = () => {
+    navigation1.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "SplashScreen" }], // Replace 'Home' with the name of your initial route
+      })
+    );
+  };
 
   const otpInputRef = useRef();
   const [otpErr, setOtpErr] = useState(false);
@@ -61,6 +74,7 @@ export default function Otp(props) {
     setLoading(false);
     setResendDisabled(false);
     setAuthButtonInvalid(false)
+    return goBackToInitialRoute();
   };
 
   const onResendPress = async () => {

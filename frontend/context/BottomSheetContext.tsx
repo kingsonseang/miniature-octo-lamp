@@ -12,7 +12,7 @@ const BottomSheetProvider: React.FC<{ children: React.ReactElement }> = ({
   children,
 }) => {
   // variables
-  const snapPoints = useMemo(() => ["35%", "60%"], []);
+  const snapPoints = useMemo(() => ["10%", "15%", "20%", "25%", "30%", "37%", "40%", "45%", "60%", "90%"], []);
 
   return (
     <BottomSheetContext.Provider value={{ snapPoints }}>

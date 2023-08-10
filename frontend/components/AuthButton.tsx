@@ -14,7 +14,7 @@ export default function AuthButton({
   loading,
 }: {
   disbaled: boolean;
-  onpress: () => {};
+  onpress: any;
   text: string;
   loading: boolean;
 }) {

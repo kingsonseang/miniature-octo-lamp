@@ -7,6 +7,29 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+async function simpleUpload(file, path) {
+  try {
+    let files = file ? file : false;
+    let paths = path ? path : false;
+
+    if (files != false && paths != false) {
+      const upload = await cloudinary.v2.uploader.upload(file, {
+        resource_type: 'image',
+        folder: paths,
+        use_filename: false,
+        unique_filename: true,
+      });
+      console.log(upload);
+      return { secure_url: upload.secure_url, public_id: upload.public_id };
+    }
+
+    return { error: 'Images are missing' };
+  } catch (error) {
+    console.log(error);
+    return { error: Errordisplay(error).msg };
+  }
+}
+
 async function uploadImg(file, path) {
   try {
     let files = file ? file : false;
@@ -80,4 +103,4 @@ async function addpdf(file) {
   }
 }
 
-module.exports = { uploadImg, deleteImg, deleteBulkImg, addpdf };
+module.exports = { uploadImg, deleteImg, deleteBulkImg, addpdf, simpleUpload };

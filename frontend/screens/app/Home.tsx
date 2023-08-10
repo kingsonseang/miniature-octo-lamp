@@ -11,6 +11,8 @@ import {
   useAnimatedValue,
   Animated,
   Easing,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, {
   useCallback,
@@ -22,51 +24,65 @@ import React, {
 import { StatusBar } from "expo-status-bar";
 import styles from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Entypo, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  Feather,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import PillButton from "../../components/PillButton";
 import RecipeListItem from "../../components/RecipeListItem";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { BottomSheetContext } from "../../context/BottomSheetContext";
 import Constants from "expo-constants";
 import { greetings } from "../../constants/greetins";
+import DropDownPicker from "react-native-dropdown-picker";
+import recipeApi from "../../utils/recipeApi";
+import { colors } from "../../constants/colors";
+import LottieView from "lottie-react-native";
+import { AuthContext } from "../../context/AuthContext";
+
+type ApiResponseType = { results: any };
 
 export default function Home({ navigation }: any) {
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="small" color="#000000" />
+      </View>
+    );
+  }
+
+  const {
+    cuisine,
+    setCuisine,
+    cuisineList,
+    setCuisineList,
+    allergens,
+    setAllergens,
+    allergensList,
+    setAllergensList,
+    diet,
+    setDiet,
+    dietList,
+    setDietList,
+    category,
+  } = authContext;
+
+  const [pageData, setPageData] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+
+  const animation = useRef<LottieView>(null);
+
   // Get the status bar height from Expo Constants
   const statusBarHeight = Constants.statusBarHeight || 0;
 
   const searchInputRef = useRef<TextInput | null>(null);
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
-  const animatedOpacity = useState(new Animated.Value(0))[0];
 
-  // Function to toggle the visibility of the view
-  const toggleView = (value: boolean) => {
-    setBottomSheetOpen(value);
-    
-    Animated.timing(animatedOpacity, {
-      toValue: value === false ? 0 : 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const { snapPoints }: any = useContext(BottomSheetContext);
-
-  // bottom sheet callbacks
-  const handleSnapPress = useCallback((index: number) => {
-    toggleView(true);
-    bottomSheetRef.current?.snapToIndex(index);
-  }, []);
-
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      toggleView(false);
-    }
-  }, []);
-
-  const [_selected, setSelected] = useState(1);
+  const [_selected, setSelected] = useState(0);
   const [gridView, setgridView] = useState(true);
 
   const [greetingText, setGreetingText] = useState("");
@@ -131,81 +147,105 @@ export default function Home({ navigation }: any) {
   };
 
   useEffect(() => {
+     // Update the animated value with the new greeting
+     Animated.timing(opacity, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start()
     // Update the greeting text immediately when the component mounts
     setGreetingText(getGreetingText());
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 200,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
 
     // Start an interval to update the greeting text every minute (or any desired interval)
     const interval = setInterval(() => {
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start()
       setGreetingText(getGreetingText());
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start();
     }, 60000); // Update every minute
 
     // Clear the interval when the component unmounts
     return () => clearInterval(interval);
   }, []);
 
-  const dataArray = [
-    {
-      _id: 1,
-      name: "Beetroot Quinoa Salad Dressing",
-      cookTime: 30 * 60 * 1000, // 30 minutes converted to milliseconds
-      views: 150,
-      image:
-        "https://cleananddelicious.com/wp-content/uploads/2021/03/Quinoa.Beet_.Salad_.blog-11.jpg",
-    },
-    {
-      _id: 2,
-      name: "Pasta Carbonara",
-      cookTime: 25 * 60 * 1000, // 25 minutes converted to milliseconds
-      views: 200,
-      image:
-        "https://s23209.pcdn.co/wp-content/uploads/2014/03/IMG_2622edit.jpg",
-    },
-    // Add more data objects below
-    {
-      _id: 3,
-      name: "Grilled Chicken",
-      cookTime: 45 * 60 * 1000, // 45 minutes converted to milliseconds
-      views: 180,
-      image:
-        "https://www.themediterraneandish.com/wp-content/uploads/2020/07/grilled-whole-chicken-recipe-9-1024x1536.jpg",
-    },
-    {
-      _id: 4,
-      name: "Chocolate Brownies",
-      cookTime: 40 * 60 * 1000, // 40 minutes converted to milliseconds
-      views: 250,
-      image:
-        "https://neighborfoodblog.com/wp-content/uploads/2020/05/easy-homemade-brownies-5-540x720.jpg",
-    },
-    {
-      _id: 5,
-      name: "Mushroom Soup",
-      cookTime: 20 * 60 * 1000, // 20 minutes converted to milliseconds
-      views: 300,
-      image:
-        "https://www.cookingclassy.com/wp-content/uploads/2022/09/cream-of-mushroom-soup-2.jpg",
-    },
-    {
-      _id: 6,
-      name: "Spaghetti Bolognese",
-      cookTime: 35 * 60 * 1000, // 35 minutes converted to milliseconds
-      views: 220,
-      image:
-        "https://pinchofnom.com/wp-content/uploads/2022/01/Veggie-Spaghetti-Bolognese-01.jpg",
-    },
-    {
-      _id: 7,
-      name: "Fruit Smoothie",
-      cookTime: 10 * 60 * 1000, // 10 minutes converted to milliseconds
-      views: 280,
-      image:
-        "https://www.dinneratthezoo.com/wp-content/uploads/2018/05/frozen-fruit-smoothie-3.jpg",
-    },
-  ];
-
   const setCurrentSelected = (id: any) => {
     setSelected(id);
   };
+
+  function getRandomNumber() {
+    const min = 15;
+    const max = 34;
+    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomNumber;
+  }
+
+  async function getData() {
+    const randomNum = await getRandomNumber();
+
+    const type = _selected === 0 ? '' : category[_selected];
+
+    // f7debcf8fd754900b4dd27598c706bc2
+    // 6d2604515554406a9bc1857bbfd62e18
+
+    await recipeApi
+      .get<ApiResponseType>(
+        `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(', ')}&diet=${diet.join(', ')}&intolerances=${allergens.join(', ')}`
+      )
+      .then((res) => {
+        console.log(res.data);
+        setPageData(res.data?.results);
+      });
+  }
+
+  useEffect(() => {
+    handleRefresh();
+  }, [cuisine, allergens, diet]);
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await getData();
+    setLoading(false);
+  };
+
+  const handleCategoryChange = async (index: number) => {
+    setLoading(true);
+    const randomNum = await getRandomNumber();
+    await setSelected(index);
+
+    const type = _selected === 0 ? '' : category[index];
+
+    await recipeApi
+      .get<ApiResponseType>(
+        `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(', ')}&diet=${diet.join(', ')}&intolerances=${allergens.join(', ')}`
+      )
+      .then((res) => {
+        console.log(res.data);
+        setPageData(res.data?.results);
+      });
+    setLoading(false);
+  };
+
+  // search
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const handleSearch = () => {
+    navigation.navigate("Search", { searchTerm: searchTerm })
+  }
 
   return (
     <Pressable
@@ -215,8 +255,22 @@ export default function Home({ navigation }: any) {
       <StatusBar style="dark" translucent={true} />
       <ScrollView
         style={[styles.container]}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={handleRefresh}
+            colors={[
+              colors.primaryColor,
+              colors.secondaryColor,
+              colors.tetiaryColor,
+            ]}
+            style={{
+              backgroundColor: colors.buttonColor
+            }}
+          />
+        }
         contentContainerStyle={{
-          gap: Dimensions.get("window").height * 0.02,
+          gap: Dimensions.get("window").height * 0.01,
         }}
         stickyHeaderIndices={[0]}
       >
@@ -237,7 +291,7 @@ export default function Home({ navigation }: any) {
           >
             <Pressable
               onPress={() => navigation.navigate("Profile")}
-              style={styles.headerbtn}
+              style={[styles.headerbtn, { backgroundColor: "#e3e8e6" }]}
             >
               <Image
                 source={{
@@ -252,21 +306,10 @@ export default function Home({ navigation }: any) {
             </Pressable>
 
             <Pressable
-              onPress={() => handleSnapPress(0)}
-              style={styles.headerbtn}
+              onPress={() => navigation.navigate("Favourite")}
+              style={[styles.headerbtn, { backgroundColor: "#f7f7f7", justifyContent: "center", alignItems: "center"}]}
             >
-              <Image
-                source={{
-                  uri: "https://thenounproject.com/api/private/icons/637659/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0",
-                }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  resizeMode: "cover",
-                  transform: [{ scale: 1.5 }],
-                  backgroundColor: "#f7f7f7",
-                }}
-              />
+              <FontAwesome name="bookmark-o" size={24} color="black" />
             </Pressable>
           </View>
         </View>
@@ -309,7 +352,14 @@ export default function Home({ navigation }: any) {
               style={[styles.textP, { flex: 1, color: "#000" }]}
               cursorColor="#000"
               placeholder="search recipies"
+              onChangeText={(e) => setSearchTerm(e)}
+              onEndEditing={()=>handleSearch()}
             />
+            {searchTerm?.length >= 3 ? (
+              <Pressable onPress={() => handleSearch()}>
+                <AntDesign name="arrowright" size={24} color="black" />
+              </Pressable>
+            ) : null}
           </Pressable>
         </View>
 
@@ -317,37 +367,24 @@ export default function Home({ navigation }: any) {
           showsHorizontalScrollIndicator={false}
           horizontal
           bounces
-          initialScrollIndex={0}
+          initialScrollIndex={_selected}
           contentContainerStyle={{
             gap: Dimensions.get("window").height * 0.02,
             paddingHorizontal: Dimensions.get("window").width * 0.06,
           }}
-          data={[
-            { _id: 1, name: "all" },
-            { _id: 2, name: "Main Course" },
-            { _id: 3, name: "Breakfast" },
-            { _id: 4, name: "Soup" },
-            { _id: 5, name: "Cakes" },
-          ]}
+          data={category}
           renderItem={({ item, index }) => {
             return (
               <PillButton
                 key={index}
-                selected={_selected === item._id}
-                text={item.name}
-                onpress={() => setCurrentSelected(item._id)}
+                selected={_selected === index}
+                text={item}
+                onpress={() => handleCategoryChange(index)}
               />
             );
           }}
         />
-
-        {/* body */}
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {/* view detials */}
+        {loading ? (
           <View
             style={[
               styles.containerPadding,
@@ -357,120 +394,121 @@ export default function Home({ navigation }: any) {
                 justifyContent: "space-between",
                 alignItems: "center",
                 paddingTop: Dimensions.get("window").height * 0.04,
+                flex: 1,
               },
             ]}
           >
-            <Text style={[styles.fs14, styles.textmP]}>15 Recipe</Text>
-
-            {/* view control */}
+            <ActivityIndicator size="small" color="#000000" />
+          </View>
+        ) : pageData ? (
+          <View
+            style={{
+              flex: 1,
+            }}
+          >
+            {/* view detials */}
             <View
-              style={{
-                flexDirection: "row",
-                gap: Dimensions.get("window").height * 0.014,
+              style={[
+                styles.containerPadding,
+                {
+                  gap: Dimensions.get("window").height * 0.02,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingTop: Dimensions.get("window").height * 0.04,
+                },
+              ]}
+            >
+              <Text style={[styles.fs14, styles.textmP]}>
+                {pageData?.length} Recipe
+              </Text>
+
+              {/* view control */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: Dimensions.get("window").height * 0.014,
+                }}
+              >
+                <Pressable onPress={() => setgridView(true)}>
+                  <MaterialCommunityIcons
+                    name="mirror-rectangle"
+                    size={22}
+                    color="black"
+                    style={!gridView && { opacity: 0.4 }}
+                  />
+                </Pressable>
+                <Pressable onPress={() => setgridView(false)}>
+                  <Feather
+                    name="grid"
+                    size={22}
+                    color="black"
+                    style={gridView && { opacity: 0.4 }}
+                  />
+                </Pressable>
+              </View>
+            </View>
+
+            {/* content */}
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal={gridView}
+              bounces
+              contentContainerStyle={{
+                gap: Dimensions.get("window").height * 0.02,
+                paddingHorizontal: Dimensions.get("window").width * 0.06,
+                paddingBottom: Dimensions.get("window").height * 0.02,
               }}
             >
-              <Pressable onPress={() => setgridView(true)}>
-                <MaterialCommunityIcons
-                  name="mirror-rectangle"
-                  size={22}
-                  color="black"
-                  style={!gridView && { opacity: 0.4 }}
-                />
-              </Pressable>
-              <Pressable onPress={() => setgridView(false)}>
-                <Feather
-                  name="grid"
-                  size={22}
-                  color="black"
-                  style={gridView && { opacity: 0.4 }}
-                />
-              </Pressable>
-            </View>
+              {pageData ? pageData.map((item: any) => {
+                return (
+                  <RecipeListItem
+                    key={item.id}
+                    horizontal={gridView}
+                    {...item}
+                    onpress={() => navigation.navigate("Recipe", { ...item })}
+                  />
+                );
+              }): null }
+            </ScrollView>
           </View>
-
-          {/* content */}
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            horizontal={gridView}
-            bounces
-            contentContainerStyle={{
-              gap: Dimensions.get("window").height * 0.02,
-              paddingHorizontal: Dimensions.get("window").width * 0.06,
-              paddingBottom: Dimensions.get("window").height * 0.02,
-            }}
-          >
-            {dataArray.map((item) => {
-              return (
-                <RecipeListItem
-                  key={item._id}
-                  horizontal={gridView}
-                  {...item}
-                />
-              );
-            })}
-          </ScrollView>
-        </View>
-      </ScrollView>
-
-      {/* Bottom sheet overlaY */}
-      <Animated.View
-        style={{
-          position: "absolute",
-          backgroundColor: "#00000040",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: animatedOpacity,
-        }}
-        pointerEvents={bottomSheetOpen === true ? 'auto' : 'none'}
-      />
-
-      {/* bottom sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        enableContentPanningGesture={true}
-        animateOnMount={false}
-        onChange={handleSheetChanges}
-        handleComponent={() => (
-          <Pressable
+        ): (
+          <View
             style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
+              flex: 1,
+              justifyContent: "center",
               alignItems: "center",
-              // backgroundColor: "green",
+              gap: Dimensions.get("window").width * 0.04,
+              paddingHorizontal: Dimensions.get("window").height * 0.04,
             }}
-            onPress={() => bottomSheetRef?.current?.close()}
           >
-            <Text style={[styles.textmP, { fontSize: 24, paddingTop: 12 }]}>
-              Menu
+            <LottieView
+              autoPlay
+              ref={animation}
+              style={{
+                width: Dimensions.get("window").width * 0.6,
+                // height: Dimensions.get("window").width * 0.6,
+                // transform: [{ scale: 1.5 }],
+              }}
+              // Find more Lottie files at https://lottiefiles.com/featured
+              source={require("../../assets/not_found_.json")}
+            />
+            <Text
+              style={[
+                styles.textmP,
+                styles.fs14,
+                {
+                  textAlign: "center",
+                  color: colors.buttonColor,
+                  opacity: 0.7,
+                },
+              ]}
+            >
+              Something went wrong on our end, we're fixing it your meals will be back in a few!
             </Text>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <Entypo name="chevron-down" size={22} color="black" />
-            </View>
-          </Pressable>
+          </View>
         )}
-        style={{
-          paddingVertical: Dimensions.get("window").height * 0.01,
-          paddingHorizontal: Dimensions.get("window").width * 0.06,
-        }}
-        backgroundStyle={{
-          backgroundColor: "#e3e8e6",
-          borderRadius: Dimensions.get("window").width * 0.1,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            // alignItems: "center",
-          }}
-        >
-          <Text>Awesome 🎉</Text>
-        </View>
-      </BottomSheet>
+      </ScrollView>
     </Pressable>
   );
 }

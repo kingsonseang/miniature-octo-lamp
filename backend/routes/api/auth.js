@@ -6,6 +6,7 @@ const auth = require('../../config/auth');
 const sendOtp = require('../../utils/sendOtp');
 const generateOTP = require('../../utils/genetateOtp');
 const sendLoginEmail = require('../../utils/sendLoginEmail');
+const sendPushNotification = require('../../utils/sendPushNotification');
 
 /**
  * @route   POST /auth/register
@@ -15,10 +16,11 @@ const sendLoginEmail = require('../../utils/sendLoginEmail');
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, firstname, lastname, username, phone } = req.body;
+    const { email, password, firstname, lastname, username } = req.body;
 
     const email_exist = await User.findOne({ email: email });
-    const phone_exist = await User.findOne({ phone: phone });
+
+    const username_exist = await User.findOne({ username: username });
 
     if (email_exist) {
       return res.status(409).send({
@@ -27,10 +29,10 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    if (phone_exist) {
+    if (username_exist) {
       return res.status(409).send({
         error: true,
-        message: 'You have entered a phone number associated with another account.',
+        message: 'You have entered a username associated with another account.',
       });
     }
 
@@ -39,7 +41,6 @@ router.post('/register', async (req, res) => {
       password: password,
       name: { first: firstname, last: lastname },
       username: username,
-      phone: phone,
     });
 
     let num = generateOTP();
@@ -85,7 +86,7 @@ router.post('/register', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password, device } = req.body;
+    const { email, password, device, publicId } = req.body;
 
     console.log(email, password);
 
@@ -127,7 +128,7 @@ router.post('/login', async (req, res) => {
         user: true,
         error: false,
         emailVerified: false,
-        message: "An email has been sent to you, Please verify you email to continue"
+        message: 'An email has been sent to you, Please verify you email to continue',
       });
     }
 
@@ -145,6 +146,25 @@ router.post('/login', async (req, res) => {
     }
 
     res.status(200).send({ user, token });
+
+    
+    sendPushNotification([{ publicId: publicId }], {
+      body: `Hi there, We missed you and your creative culinary skills, Great to have you back,\nLets get cooking 🍱`,
+      title: `Welcome back ${user.name.first} 👋`,
+      subtitle: ``,
+    });
+
+    if (user.publicIds !== [] || user.publicIds !== null) {
+      sendPushNotification(user.publicIds, {
+        body: `Hi there, We Got a new sign in from your account on another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
+        title: `New Sign in on a new device`,
+        subtitle: ``,
+      });
+    }
+
+    user.publicIds = user.publicIds.concat({ publicId: publicId, relatedToken: token });
+
+    await user.save();
   } catch (e) {
     console.log(e);
 
@@ -160,12 +180,24 @@ router.post('/login', async (req, res) => {
  * @desc    Logout a user
  * @access  Private
  */
+router.post('/validation/username', async (req, res) => {
+  const { username } = req;
+
+  res.status(200).json({ username: username, valid: true, suggestions: 'king1011478, dis43923' });
+});
+
+/**
+ * @route   POST /auth/logout
+ * @desc    Logout a user
+ * @access  Private
+ */
 router.post('/logout', auth, async (req, res) => {
   const { user } = req;
   try {
     user.tokens = user.tokens.filter(token => {
       return token.token !== req.token;
     });
+
     user.publicIds = user.publicIds.filter(publicId => {
       return publicId.relatedToken !== req.token;
     });
@@ -299,13 +331,14 @@ router.post('/verify', async (req, res) => {
   }
 
   user.emailVerified = true;
-  await user.save()
+  user.role = 'verified';
+  await user.save();
 
   const token = await user.generateAuthToken();
 
   return res.status(200).send({
     error: false,
-    token: token
+    token: token,
   });
 });
 

@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 
 const userSchema = Schema(
   {
-    username: { type: String, required: true },
+    username: { type: String, unique: true, required: false },
     name: {
       first: { type: String, required: true },
       last: { type: String, required: true },
@@ -15,7 +15,7 @@ const userSchema = Schema(
     },
     email: { type: String, unique: true },
     password: String,
-    phone: { type: String, unique: true },
+    phone: { type: String, unique: true, required: false },
     emailVerified: { type: Boolean, default: false },
     role: {
       type: String,
@@ -29,6 +29,19 @@ const userSchema = Schema(
         relatedToken: { type: String, required: true },
       },
     ],
+    liked: { type: Array, required: false },
+    views: [
+      {
+        recipe: { type: String, required: true },
+        __v: { type: Number, required: true, default: 1 },
+      },
+    ],
+    cooked: { type: Array, required: false },
+    cuisine: { type: Array, required: false },
+    excludeCuisine: { type: Array, required: false },
+    diet: { type: Array, required: false },
+    intolerances: { type: Array, required: false },
+    profile_picture: { type: String, required: false }
   },
   { timestamps: true }
 );

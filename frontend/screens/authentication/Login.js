@@ -15,10 +15,24 @@ import AuthButton from "../../components/AuthButton";
 import { StatusBar } from "expo-status-bar";
 import { AuthContext } from "../../context/AuthContext";
 import { isValidEmail, isValidPassword } from "../../utils/validate";
+import { CommonActions } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+
 
 export default function Login({ navigation }) {
 
   const { Login } = useContext(AuthContext)
+
+  const navigation1 = useNavigation();
+
+  const goBackToInitialRoute = () => {
+    navigation1.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "SplashScreen" }], // Replace 'Home' with the name of your initial route
+      })
+    );
+  };
 
   const emailInputRef = useRef();
   const [emailErr, setEmailErr] = useState(false);
@@ -99,6 +113,8 @@ export default function Login({ navigation }) {
       setAuthButtonInvalid(!loggedIn?.error)
       return
     }
+
+    return goBackToInitialRoute();
   }
 
   return (
@@ -234,7 +250,7 @@ export default function Login({ navigation }) {
           <Text allowFontScaling style={[styles.textmP, styles.fs12, { opacity: 0.6 }]}>
             Forgot your password?
           </Text>
-          <Pressable onPress={() => navigation.navigate("Create")}>
+          <Pressable onPress={() => navigation.navigate("Reset")}>
             <Text allowFontScaling style={[styles.textmP, styles.fs12]}>Reset</Text>
           </Pressable>
         </View>

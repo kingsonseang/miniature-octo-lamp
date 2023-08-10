@@ -4,6 +4,7 @@ import * as Device from "expo-device";
 import expoPushTokens from "../utils/expoPushTokens";
 import { AuthContext } from "./AuthContext";
 import NetInfo from "@react-native-community/netinfo";
+import Constants from "expo-constants";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -45,14 +46,14 @@ const NotificationProvider = ({ children }) => {
       let finalStatus = existingStatus;
       if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync({
-          projectId: "com.kingsonseang.black_bento",
+          projectId: Constants.expoConfig.extra.eas.projectId,
         });
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
         throw new Error("Failed to get push token for push notification!");
       }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig.extra.eas.projectId, })).data;
       console.log(token);
       console.log(Device.brand, Device.designName, Device.modelName);
     } else {
@@ -76,14 +77,12 @@ const NotificationProvider = ({ children }) => {
 
   const setupNotificationListeners = async () => {
     // check if user is authenticated
-    const authStatus = await isAuthenticated();
-
     await NetInfo.addEventListener(async (state) => {
       if (state.isConnected !== true) {
         return alert("App needs an internet connection to fetch your data");
       }
 
-      if (authStatus !== true && userToken) {
+      if (userToken) {
         console.log("Get the Expo push token and store it to the server");
         // Get the Expo push token and store it to the server
         try {

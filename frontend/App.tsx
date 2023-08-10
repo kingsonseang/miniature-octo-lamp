@@ -9,6 +9,7 @@ import {
   useFonts,
   Poppins_400Regular,
   Poppins_500Medium,
+  Poppins_600SemiBold,
   Montserrat_400Regular,
   Montserrat_500Medium,
   SpaceGrotesk_400Regular,
@@ -17,14 +18,16 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Platform } from "react-native";
+import SplashScreenStack from "./screens/SplashScreen";
 
 export default function App() {
-  NavigationBar.setPositionAsync("absolute");
+  Platform.OS === "android" ? NavigationBar.setPositionAsync("absolute") : null
   Platform.OS === "android" ? NavigationBar.setBackgroundColorAsync("#ffffff00") : null
 
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
+    Poppins_600SemiBold,
     Montserrat_400Regular,
     Montserrat_500Medium,
     SpaceGrotesk_400Regular,

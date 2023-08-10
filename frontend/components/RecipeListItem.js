@@ -8,34 +8,41 @@ import {
 } from "react-native";
 import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
 // normal list item
-export default function RecipeListItem({
-  name,
-  image,
-  cookTime,
-  views,
-  horizontal,
-}) {
+export default function RecipeListItem(props) {
 
-  const width = Dimensions.get("window").width
-  const contentheight = Dimensions.get("window").height
-  
+  const {
+    title,
+    image,
+    horizontal,
+    onpress,
+    aggregateLikes,
+    readyInMinutes
+  } = props
+
+  const width = Dimensions.get("window").width;
+  const contentheight = Dimensions.get("window").height;
+
   // Shared value to represent if the component is displayed horizontally or not
-  const isHorizontal = useSharedValue(horizontal ? contentheight * 0.5 : contentheight * 0.20);
-
-  // Utility function to format cookTime from milliseconds to time string (hh:mm)
-  const formatCookTime = (milliseconds) => {
-    const date = new Date(milliseconds);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
+  const isHorizontal = useSharedValue(
+    horizontal ? contentheight * 0.5 : contentheight * 0.2
+  );
 
   useEffect(() => {
-    isHorizontal.value = withTiming(horizontal ? contentheight * 0.5 : contentheight * 0.20, {
-      duration: 500,
-      easing: Easing.linear,
-    });
+    isHorizontal.value = withTiming(
+      horizontal ? contentheight * 0.5 : contentheight * 0.2,
+      {
+        duration: 500,
+        easing: Easing.linear,
+      }
+    );
   }, [horizontal, isHorizontal]);
 
   // Animated styles for the LinearGradient
@@ -58,8 +65,7 @@ export default function RecipeListItem({
   });
 
   const containerStyle = useAnimatedStyle(() => {
-    const height = horizontal ? isHorizontal.value
-      : (isHorizontal.value);
+    const height = horizontal ? isHorizontal.value : isHorizontal.value;
 
     return {
       height,
@@ -67,27 +73,27 @@ export default function RecipeListItem({
   });
 
   return (
-    <Pressable>
-    <Animated.View
-      style={[
-        styles.container,
-        containerStyle
-      ]}
-    >
-      <Image source={{ uri: image }} style={styles.image} />
+    <Pressable onPress={onpress}>
+      <Animated.View style={[styles.container, containerStyle]}>
+        <Image source={{ uri: image }} style={styles.image} />
 
-      <LinearGradient style={styles.overlay} colors={["transparent", "rgba(0,0,0,0.8)"]}>
-        <Animated.View
-          style={linearGradientStyle}
+        <LinearGradient
+          style={styles.overlay}
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
         >
-          <Text style={styles.title}>{name}</Text>
-          <View style={styles.pills}>
-            <Text style={styles.pill}>{formatCookTime(cookTime)} mins</Text>
-            <Text style={styles.pill}>{views} views</Text>
-          </View>
-        </Animated.View>
-      </LinearGradient>
-    </Animated.View>
+          <Animated.View style={linearGradientStyle}>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.pills}>
+            {readyInMinutes > 1 ? <View style={styles.pill}>
+                <Text style={styles.pillText}>{readyInMinutes} mins</Text>
+              </View> : null}
+              <View style={styles.pill}>
+                <Text style={styles.pillText}>{parseInt(aggregateLikes).toLocaleString()} views</Text>
+              </View>
+            </View>
+          </Animated.View>
+        </LinearGradient>
+      </Animated.View>
     </Pressable>
   );
 }
@@ -124,10 +130,12 @@ const styles = StyleSheet.create({
   },
   pill: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
-    color: "#fff",
-    fontFamily: "Poppins_500Medium",
     paddingVertical: Dimensions.get("window").width * 0.005,
     paddingHorizontal: Dimensions.get("window").width * 0.024,
     borderRadius: Dimensions.get("window").width * 0.04,
   },
+  pillText: {
+    color: "#fff",
+    fontFamily: "Poppins_500Medium",
+  }
 });

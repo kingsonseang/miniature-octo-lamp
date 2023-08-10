@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('../../models/User');
 const auth = require('../../config/auth');
+const { simpleUpload } = require('../../utils/cloudinary');
 
 /**
  * @route   POST /
@@ -31,8 +32,10 @@ router.get('/', auth, async (req, res) => {
  * @access  Private
  */
 router.get('/me', auth, async (req, res) => {
+  const { user } = req;
+
   try {
-    res.send(req.user);
+    res.status(200).send({ user: user });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -54,6 +57,56 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 /**
+ * @route   PATCH /users/me/preference/*
+ * @desc    Update logged in user preferences
+ * @access  Private
+ */
+router.patch('/me/profle_prictue', auth, async (req, res) => {
+  try {
+    const { user, body } = req;
+    
+    user.profile_picture = body.image
+
+    await user.save();
+
+    res.send({ user: user });
+  } catch (e) {
+    return res.status(400).send(e);
+  }
+});
+
+/**
+ * @route   PATCH /users/me/preference/*
+ * @desc    Update logged in user preferences
+ * @access  Private
+ */
+router.patch('/me/preference', auth, async (req, res) => {
+  const validationErrors = [];
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['cuisine', 'excludeCuisine', 'diet', 'intolerances'];
+  const isValidOperation = updates.every(update => {
+    const isValid = allowedUpdates.includes(update);
+    if (!isValid) validationErrors.push(update);
+    return isValid;
+  });
+
+  if (!isValidOperation)
+    return res.status(400).send({ error: `Invalid updates: ${validationErrors.join(',')}` });
+
+  try {
+    const { user } = req;
+    updates.forEach(update => {
+      user[update] = req.body[update];
+    });
+
+    await user.save();
+    return res.send({ user: user });
+  } catch (e) {
+    return res.status(400).send(e);
+  }
+});
+
+/**
  * @route   PATCH /users/me
  * @desc    Update logged in user
  * @access  Private
@@ -61,7 +114,7 @@ router.get('/:id', auth, async (req, res) => {
 router.patch('/me', auth, async (req, res) => {
   const validationErrors = [];
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password', 'role'];
+  const allowedUpdates = ['name', 'email', 'password', 'liked', 'cooked', 'views'];
   const isValidOperation = updates.every(update => {
     const isValid = allowedUpdates.includes(update);
     if (!isValid) validationErrors.push(update);
@@ -92,7 +145,7 @@ router.patch('/me', auth, async (req, res) => {
 router.patch('/:id', auth, async (req, res) => {
   const validationErrors = [];
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password'];
+  const allowedUpdates = ['name', 'email', 'password', 'liked'];
   const isValidOperation = updates.every(update => {
     const isValid = allowedUpdates.includes(update);
     if (!isValid) validationErrors.push(update);
@@ -166,7 +219,7 @@ router.post('/set-push-token', auth, async (req, res) => {
     token,
   } = req;
 
-  console.log(token, user, newPublicId)
+  console.log(token, user, newPublicId);
 
   user.publicIds = user.publicIds.filter(publicId => {
     return publicId.relatedToken !== token;
@@ -174,9 +227,72 @@ router.post('/set-push-token', auth, async (req, res) => {
 
   user.publicIds.concat({ publicId: newPublicId, relatedToken: token });
 
-  await user.save()
+  await user.save();
 
   res.status(201).send();
+});
+
+/**
+ * @route   Recipe /recipe/like
+ * @desc    Add liked recipe
+ * @access  Private
+ */
+router.post('/recipe/like', auth, async (req, res) => {
+  const {
+    body: { recipe },
+    user,
+  } = req;
+
+  const isLiked = await user.liked.includes(recipe);
+
+  if (isLiked === true) {
+    user.liked = user.liked.filter(likedRecipe => likedRecipe !== recipe);
+
+    res.status(201).send({ isLiked: false });
+  } else {
+    user.liked.push(recipe);
+
+    res.status(201).send({ isLiked: true });
+  }
+
+  await user.save();
+});
+
+/**
+ * @route   Recipe /recipe/check-like
+ * @desc    Check if recipe is liked already
+ * @access  Private
+ */
+router.post('/recipe/check-like', auth, async (req, res) => {
+  const {
+    body: { targetId },
+    user,
+  } = req;
+
+  const isLiked = await user.liked.some(item => item.id === targetId);;
+
+  console.log(isLiked);
+
+  return res.status(200).json({ isLiked });
+});
+
+/**
+ * @route   Recipe /recipe/like
+ * @desc    Add liked recipe
+ * @access  Private
+ */
+router.post('/recipe/cook', auth, async (req, res) => {
+  const {
+    body: { recipe },
+    user,
+  } = req;
+
+
+  user.cooked.push(recipe);
+
+  res.status(201).send({ cooked: true });
+
+  await user.save();
 });
 
 module.exports = router;
