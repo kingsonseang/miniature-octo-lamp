@@ -137,12 +137,6 @@ const NotificationProvider = ({ children }) => {
                 }
               }
             );
-
-          // Listen for notification dismissal
-          responseListener.current =
-            Notifications.addNotificationDismissedListener(() => {
-              decreaseBadgeCount();
-            });
         } catch (error) {
           console.log("Error setting up notification listeners:", error);
         }

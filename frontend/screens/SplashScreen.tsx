@@ -45,7 +45,7 @@ function SplashScreen({ navigation }: { navigation: any }) {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "black",
+        backgroundColor: "#fff",
       }}
     >
       <StatusBar style="light" />
@@ -55,7 +55,7 @@ function SplashScreen({ navigation }: { navigation: any }) {
         style={{
           width: Dimensions.get("window").width,
           height: Dimensions.get("window").width,
-          backgroundColor: "#000",
+          backgroundColor: "#fff",
           transform: [{ scale: 1.5 }],
         }}
         // Find more Lottie files at https://lottiefiles.com/featured
