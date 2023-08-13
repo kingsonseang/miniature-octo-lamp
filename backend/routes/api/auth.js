@@ -90,15 +90,27 @@ router.post('/login', async (req, res) => {
 
     console.log(email, password);
 
-    const user = await User.findByCredentials(email, password);
+    const userStatus = await User.findByCredentials(email, password);
 
-    if (!user) {
+    console.log(userStatus);
+
+    if (!userStatus.exists) {
       return res.send({
         user: false,
         error: true,
         message: 'Email not associated with a Black Bento account!',
       });
     }
+
+    if (!userStatus.isMatch) {
+      return res.send({
+        user: false,
+        error: true,
+        message: 'Password doesn\'t match the associated account!',
+      });
+    }
+
+    const user = userStatus.user
 
     if (user?.emailVerified === false) {
       // Delete token if any

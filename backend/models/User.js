@@ -41,7 +41,7 @@ const userSchema = Schema(
     excludeCuisine: { type: Array, required: false },
     diet: { type: Array, required: false },
     intolerances: { type: Array, required: false },
-    profile_picture: { type: String, required: false }
+    profile_picture: { type: String, required: false },
   },
   { timestamps: true }
 );
@@ -93,12 +93,16 @@ userSchema.methods.generateAuthToken = async function() {
 userSchema.statics.findByCredentials = async function(email, password) {
   const User = this;
   const user = await User.findOne({ email });
-  if (!user) throw new Error('Unable to login');
+
+  console.log(user);
+
+  if (!user) return { isMatch: false, exists: false };
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error('Unable to login');
 
-  return user;
+  if (!isMatch) return { isMatch: false, exists: true };
+
+  return { isMatch: true, exists: true, user: user };
 };
 
 /**
