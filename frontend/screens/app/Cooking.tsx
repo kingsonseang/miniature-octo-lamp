@@ -111,7 +111,7 @@ const Cooking: React.FC<MyScreenProps> = (props) => {
   const [isOpen, setIsOpen] = useState(true);
   const [cooked, setCooked] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [expandedKey, setExpandedKey] = useState(0);
+  const [expandedKey, setExpandedKey] = useState(1);
 
   function _head(item: any) {
     return (
@@ -204,7 +204,7 @@ const Cooking: React.FC<MyScreenProps> = (props) => {
         ) : null}
 
         {/* render step ingredients */}
-        {item.ingredients.lenght > 0 ? (
+        {item.ingredients.length > 0 ? (
           <View style={{ marginTop: Dimensions.get("window").height * 0.01 }}>
             <Text style={[styles.fs14, styles.textmP]}>Ingredients</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -237,7 +237,7 @@ const Cooking: React.FC<MyScreenProps> = (props) => {
         ) : null}
 
         {/* render step equipment */}
-        {item.equipment.lenght > 0 ? (
+        {item.equipment.length > 0 ? (
           <View style={{ marginTop: Dimensions.get("window").height * 0.01 }}>
             <Text style={[styles.fs14, styles.textmP]}>Equipment</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>

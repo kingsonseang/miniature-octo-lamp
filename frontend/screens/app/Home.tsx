@@ -189,8 +189,8 @@ export default function Home({ navigation }: any) {
   };
 
   function getRandomNumber() {
-    const min = 15;
-    const max = 34;
+    const min = 30;
+    const max = 86;
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
     return randomNumber;
   }

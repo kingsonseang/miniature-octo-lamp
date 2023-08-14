@@ -231,8 +231,6 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         publicId: notificationToken,
       });
 
-      console.log(response?.data);
-
       if (!response.data) {
         alert("An error occurred");
         return undefined;
@@ -253,7 +251,6 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         JSON.stringify(response.data.user)
       );
       setUserData(response.data?.user);
-      console.log(response.data.user);
 
       return true;
     } catch (error) {
@@ -305,8 +302,6 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         email: email,
         digits: otp,
       });
-
-      console.log(response.data);
 
       if (!response.data) {
         alert("An error occurred");
@@ -408,8 +403,6 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
       alert("You arent connected to the internet");
       return;
     }
-
-    console.log({ cuisine, diet, allergens });
 
     try {
       const response = await api.patch<ApiResponse>(
