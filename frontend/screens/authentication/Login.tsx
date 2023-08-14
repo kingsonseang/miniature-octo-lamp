@@ -18,6 +18,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { isValidEmail, isValidPassword } from "../../utils/validate";
 import { CommonActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../constants/colors";
 
 export default function Login(props: any) {
   const {
@@ -325,6 +326,25 @@ export default function Login(props: any) {
             </Text>
           </Text>
         </View>
+
+        {loading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: colors.secondaryColor,
+            opacity: 0.5,
+          }}
+        >
+          <ActivityIndicator size="small" color="#000000" />
+        </View>
+      ) : null}
       </SafeAreaView>
     </Pressable>
   );
