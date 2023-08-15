@@ -208,13 +208,6 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
 
   // loggin user
   const Login = async (email: string, password: string) => {
-    await checkConnectivity();
-
-    if (isConnected === false) {
-      alert("You arent connected to the internet");
-      return;
-    }
-
     await AsyncStorage.multiRemove(["userToken", "userData", "Visibility"]);
 
     let notificationToken = (

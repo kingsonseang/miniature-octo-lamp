@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   baseURL: "https://api.spoonacular.com/recipes/",
 });
 
-
 const recipeApi = create({
   axiosInstance: axiosInstance,
   baseURL: undefined,
