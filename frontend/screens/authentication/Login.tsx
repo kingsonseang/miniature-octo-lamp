@@ -98,8 +98,7 @@ export default function Login(props: any) {
 
     setLoading(true);
     const loggedIn = await Login(email.toLowerCase(), password);
-
-    console.log(loggedIn);
+    alert('login complete')
 
     if (!loggedIn) {
       setAuthButtonInvalid(false);
