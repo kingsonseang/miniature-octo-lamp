@@ -148,14 +148,14 @@ router.post('/login', async (req, res) => {
 
     const token = await user.generateAuthToken();
 
-    if (!sendUserLoginEmail?.sent) {
-      return res.send({
-        user: true,
-        error: true,
-        token: token,
-        message: 'An error occured when sending login mail.',
-      });
-    }
+    // if (!sendUserLoginEmail?.sent) {
+    //   return res.send({
+    //     user: true,
+    //     error: true,
+    //     token: token,
+    //     message: 'An error occured when sending login mail.',
+    //   });
+    // }
 
     res.status(200).send({ user, token });
 

@@ -127,10 +127,10 @@ export default function LoginPage(props: any) {
 
       const deviceData = Device;
 
-      const response = await axios.post<ApiResponse>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
+      const response = await axios.post<any>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
         email: email.toLowerCase(),
         password: password,
-        device: deviceData,
+        // device: deviceData,
         // publicId: notificationToken,
       });
 
@@ -143,9 +143,6 @@ export default function LoginPage(props: any) {
       }
 
       console.log(response.data);
-
-      const resp = response.data;
-      
 
       if (
         response.data?.error === true ||
@@ -160,7 +157,7 @@ export default function LoginPage(props: any) {
 
       if (
         response.data?.error === false ||
-        resp?.emailVerified === false
+        response.data?.emailVerified === false
       ) {
         setAuthButtonInvalid(false);
         setLoading(false);
