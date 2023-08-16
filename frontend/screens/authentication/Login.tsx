@@ -76,7 +76,6 @@ export default function LoginPage(props: any) {
   const [authButtonInvalid, setAuthButtonInvalid] = useState(false);
   const [loading, setLoading] = useState(false);
 
-
   const handleOnPress = async () => {
     if (loading == true) {
       return;
@@ -112,78 +111,75 @@ export default function LoginPage(props: any) {
 
     setLoading(true);
 
-    try {
-      await NetInfo.addEventListener((state) => {
-        if (state.isConnected === false) {
-          return alert("You arent connected to the internet");
-        }
-      });
+    await NetInfo.addEventListener((state) => {
+      if (state.isConnected === false) {
+        return alert("You arent connected to the internet");
+      }
+    });
 
-      const notificationToken = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId: "92851726-6c9e-4590-82cf-0f769797391b",
-        })
-      ).data;
+    const notificationToken = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: "92851726-6c9e-4590-82cf-0f769797391b",
+      })
+    ).data;
 
-      const deviceData = Device;
+    const deviceData = Device;
 
-      const response = await axios.post<any>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
+    const response = await axios
+      .post<any>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
         email: email.toLowerCase(),
         password: password,
         // device: deviceData,
         // publicId: notificationToken,
+      })
+      .then(async (response) => {
+        if (!response.data) {
+          alert("An error occurred");
+          setAuthButtonInvalid(false);
+          setLoading(false);
+          setAuthButtonInvalid(false);
+          return;
+        }
+
+        console.log(response.data);
+
+        if (
+          response.data?.error === true ||
+          response.data?.emailVerified === false
+        ) {
+          alert(response.data?.message);
+          setAuthButtonInvalid(false);
+          setLoading(false);
+          setAuthButtonInvalid(!response.data?.error);
+          return;
+        }
+
+        if (
+          response.data?.error === false ||
+          response.data?.emailVerified === false
+        ) {
+          setAuthButtonInvalid(false);
+          setLoading(false);
+          setAuthButtonInvalid(false);
+
+          // send user to otp page
+          return navigation.navigate("Otp", { email: email.toLowerCase() });
+        }
+
+        if (response.data?.error) {
+          setAuthButtonInvalid(false);
+          setLoading(false);
+          setAuthButtonInvalid(!response.data?.error);
+          alert("An error occurred");
+          return;
+        }
+
+        const loggedIn = await Login(response.data?.token, response.data?.user);
+
+        if (loggedIn) {
+          return goBackToInitialRoute();
+        }
       });
-
-      if (!response.data) {
-        alert("An error occurred");
-        setAuthButtonInvalid(false);
-        setLoading(false);
-        setAuthButtonInvalid(false);
-        return;
-      }
-
-      console.log(response.data);
-
-      if (
-        response.data?.error === true ||
-        response.data?.emailVerified === false
-      ) {
-        alert(response.data?.message);
-        setAuthButtonInvalid(false);
-        setLoading(false);
-        setAuthButtonInvalid(!response.data?.error);
-        return;
-      }
-
-      if (
-        response.data?.error === false ||
-        response.data?.emailVerified === false
-      ) {
-        setAuthButtonInvalid(false);
-        setLoading(false);
-        setAuthButtonInvalid(false);
-
-        // send user to otp page
-        return navigation.navigate("Otp", { email: email.toLowerCase() });
-      }
-
-      if (response.data?.error) {
-        setAuthButtonInvalid(false);
-        setLoading(false);
-        setAuthButtonInvalid(!response.data?.error);
-        alert("An error occurred");
-        return;
-      }
-
-      const loggedIn = await Login(response.data?.token, response.data?.user);
-
-      if (loggedIn) {
-        return goBackToInitialRoute();
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      return undefined;
-    }
   };
 
   return (
