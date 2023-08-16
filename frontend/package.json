@@ -18,7 +18,6 @@
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
     "@types/node": "^20.4.9",
-    "@types/react-native": "^0.72.2",
     "accordion-collapse-react-native": "^1.1.1",
     "apisauce": "^3.0.1",
     "axios": "^1.4.0",
