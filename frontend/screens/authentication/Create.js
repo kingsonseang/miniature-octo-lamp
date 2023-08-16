@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Keyboard,
+  KeyboardAvoidingView,
   Linking,
   Pressable,
   Text,
@@ -194,7 +195,7 @@ export default function Create({ navigation }) {
           behavior= {(Platform.OS === 'ios')? "padding" : null}
         >
           {/* username input */}
-          <View style={[usernameErr ? null : { gap: Dimensions.get("window").height * 0.012 }]}>
+          {/* <View style={[usernameErr ? null : { gap: Dimensions.get("window").height * 0.012 }]}>
             <Text allowFontScaling style={[styles.fs14, styles.textmP]}>
               Username <Text style={[styles.fs12, styles.textP]}>(Optional)</Text>
             </Text>
@@ -239,7 +240,7 @@ export default function Create({ navigation }) {
               {usernameValid === true && usernameLoading === false ? <AntDesign name="checkcircleo" size={18} color="black" /> : null }
               {usernameValid === false && usernameLoading === false ? <AntDesign name="exclamationcircleo" size={24} color="red" /> : null}
             </Pressable>
-          </View>
+          </View> */}
 
           {/* name */}
           <View

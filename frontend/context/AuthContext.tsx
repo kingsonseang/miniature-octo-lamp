@@ -13,9 +13,8 @@ type AuthContextType = {
   userData: any;
   isAuthenticated: () => Promise<boolean>;
   Login: (
-    email: string,
-    password: string
-  ) => Promise<boolean | ApiResponse | undefined>;
+    token: string, userdata: any
+  ) => Promise<boolean | undefined>;
   Register: (
     email: string,
     password: string,
@@ -52,8 +51,14 @@ type AuthContextType = {
   dietList: any;
   setDietList: any;
   category: string[];
-  SendVerifyEmail: (email: string) => Promise<boolean | ApiResponse | undefined>;
-  ResetPassword: (email: string, otp: string | number, password: string) => Promise<boolean | ApiResponse | undefined>;
+  SendVerifyEmail: (
+    email: string
+  ) => Promise<boolean | ApiResponse | undefined>;
+  ResetPassword: (
+    email: string,
+    otp: string | number,
+    password: string
+  ) => Promise<boolean | ApiResponse | undefined>;
 };
 
 type ApiResponse = {
@@ -206,8 +211,17 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
     isAuthenticated();
   }, [userToken]);
 
+  const getNotToken = async () => {
+    let notificationToken = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: Constants?.expoConfig?.extra?.eas.projectId,
+      })
+    ).data;
+    return notificationToken;
+  };
+
   // loggin user
-  const Login = async (email: string, password: string) => {
+  const Login = async (token: string, userdata: any) => {
     await checkConnectivity();
 
     if (isConnected === false) {
@@ -215,46 +229,16 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
       return;
     }
 
-    let notificationToken = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId: Constants?.expoConfig?.extra?.eas.projectId,
-      })
-    ).data;
-
-    try {
-      const response = await api.post<ApiResponse>("/auth/login", {
-        email: email,
-        password: password,
-        device: Device,
-        publicId: notificationToken,
-      });
-
-      if (!response.data) {
-        alert("An error occurred");
-        return undefined;
-      }
-
-      if (
-        response.data?.error === true ||
-        response.data?.emailVerified === false
-      ) {
-        alert(response.data?.message);
-        return response.data;
-      }
-
-      await AsyncStorage.setItem("userToken", response.data.token);
-      setUserToken(response.data?.token);
-      await AsyncStorage.setItem(
-        "userData",
-        JSON.stringify(response.data.user)
-      );
-      setUserData(response.data?.user);
-
-      return true;
-    } catch (error) {
-      console.error("Error logging in:", error);
-      return undefined;
+    if (!token || !userdata) {
+      return undefined
     }
+
+    await AsyncStorage.setItem("userToken", token);
+    setUserToken(token);
+    await AsyncStorage.setItem("userData", JSON.stringify(userdata));
+    setUserData(userdata);
+
+    return true
   };
 
   // register user
@@ -500,7 +484,11 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
   };
 
   // send user email to verify with otp
-  const ResetPassword = async (email: string, otp: string | number, password: string) => {
+  const ResetPassword = async (
+    email: string,
+    otp: string | number,
+    password: string
+  ) => {
     try {
       const response = await api.post<ApiResponse>("/auth/reset", {
         email: email,
@@ -548,7 +536,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         preferenceRunner,
         uploadProfilePicture,
         SendVerifyEmail,
-        ResetPassword
+        ResetPassword,
       }}
     >
       {children}

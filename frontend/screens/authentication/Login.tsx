@@ -19,13 +19,25 @@ import { isValidEmail, isValidPassword } from "../../utils/validate";
 import { CommonActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../constants/colors";
+import NetInfo from "@react-native-community/netinfo";
+import api from "../../utils/api";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+
+type ApiResponse = {
+  error: boolean;
+  message: string;
+  emailVerified: boolean;
+  token: string;
+  user?: any;
+  // Add other properties if needed
+};
 
 export default function LoginPage(props: any) {
   const {
     navigation,
-    route: {
-      params
-    },
+    route: { params },
   } = props;
 
   const authContext = useContext(AuthContext);
@@ -37,8 +49,6 @@ export default function LoginPage(props: any) {
       </View>
     );
   }
-
-  // resetPasswordEmail
 
   const { Login } = authContext;
 
@@ -55,13 +65,24 @@ export default function LoginPage(props: any) {
 
   const emailInputRef = useRef<TextInput | null>(null);
   const [emailErr, setEmailErr] = useState(false);
-  const [email, setEmail] = useState(params?.resetPasswordEmail ? params.resetPasswordEmail : "");
+  const [email, setEmail] = useState(
+    params?.resetPasswordEmail ? params.resetPasswordEmail : ""
+  );
   const [obscure, setObscure] = useState(true);
   const passwordInputRef = useRef<TextInput | null>(null);
   const [password, setPassword] = useState("");
   const [passwordErr, setPasswordErr] = useState(false);
   const [authButtonInvalid, setAuthButtonInvalid] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const getNotToken = async () => {
+    let notificationToken = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: Constants?.expoConfig?.extra?.eas.projectId,
+      })
+    ).data;
+    return notificationToken;
+  };
 
   const handleOnPress = async () => {
     if (loading == true) {
@@ -97,42 +118,76 @@ export default function LoginPage(props: any) {
     }
 
     setLoading(true);
-    const loggedIn = await Login(email.toLowerCase(), password);
-    alert('login complete')
 
-    if (!loggedIn) {
-      setAuthButtonInvalid(false);
-      setLoading(false);
-      setAuthButtonInvalid(false);
-      return;
-    }
+    try {
+      await NetInfo.addEventListener((state) => {
+        if (state.isConnected === false) {
+          return alert("You arent connected to the internet");
+        }
+      });
 
-    if (loggedIn && typeof loggedIn !== "boolean") {
-      if (loggedIn?.error === true && loggedIn?.emailVerified === false) {
+      const notificationToken = await getNotToken()
+
+      const response = await api.post<ApiResponse>("/auth/login", {
+        email: email.toLowerCase(),
+        password: password,
+        device: Device,
+        publicId: notificationToken,
+      });
+
+      if (!response.data) {
+        alert("An error occurred");
         setAuthButtonInvalid(false);
         setLoading(false);
-        setAuthButtonInvalid(!loggedIn?.error);
+        setAuthButtonInvalid(false);
         return;
       }
 
-      if (loggedIn?.error === false && loggedIn?.emailVerified === false) {
+      console.log(response.data);
+
+      const resp = response.data;
+      
+
+      if (
+        response.data?.error === true ||
+        response.data?.emailVerified === false
+      ) {
+        alert(response.data?.message);
         setAuthButtonInvalid(false);
         setLoading(false);
-        setAuthButtonInvalid(!loggedIn?.error);
+        setAuthButtonInvalid(!response.data?.error);
+        return;
+      }
+
+      if (
+        response.data?.error === false ||
+        resp?.emailVerified === false
+      ) {
+        setAuthButtonInvalid(false);
+        setLoading(false);
+        setAuthButtonInvalid(false);
 
         // send user to otp page
         return navigation.navigate("Otp", { email: email.toLowerCase() });
       }
 
-      if (loggedIn?.error) {
+      if (response.data?.error) {
         setAuthButtonInvalid(false);
         setLoading(false);
-        setAuthButtonInvalid(!loggedIn?.error);
+        setAuthButtonInvalid(!response.data?.error);
+        alert("An error occurred");
         return;
       }
-    }
 
-    return goBackToInitialRoute();
+      const loggedIn = await Login(response.data?.token, response.data?.user);
+
+      if (loggedIn) {
+        return goBackToInitialRoute();
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      return undefined;
+    }
   };
 
   return (
@@ -327,23 +382,23 @@ export default function LoginPage(props: any) {
         </View>
 
         {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: colors.secondaryColor,
-            opacity: 0.5,
-          }}
-        >
-          <ActivityIndicator size="small" color="#000000" />
-        </View>
-      ) : null}
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: colors.secondaryColor,
+              opacity: 0.5,
+            }}
+          >
+            <ActivityIndicator size="small" color="#000000" />
+          </View>
+        ) : null}
       </SafeAreaView>
     </Pressable>
   );
