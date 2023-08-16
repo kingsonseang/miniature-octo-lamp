@@ -24,6 +24,7 @@ import api from "../../utils/api";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import axios from "axios";
 
 type ApiResponse = {
   error: boolean;
@@ -126,12 +127,14 @@ export default function LoginPage(props: any) {
         }
       });
 
-      const notificationToken = await getNotToken()
+      const notificationToken = await getNotToken();
 
-      const response = await api.post<ApiResponse>("/auth/login", {
+      const deviceData = Device;
+
+      const response = await axios.post<ApiResponse>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
         email: email.toLowerCase(),
         password: password,
-        device: Device,
+        device: deviceData,
         publicId: notificationToken,
       });
 
