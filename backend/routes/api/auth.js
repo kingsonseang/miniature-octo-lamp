@@ -160,19 +160,19 @@ router.post('/login', async (req, res) => {
     res.status(200).send({ user, token });
 
     
-    sendPushNotification([{ publicId: publicId }], {
-      body: `Hi there, We missed you and your creative culinary skills, Great to have you back,\nLets get cooking 🍱`,
-      title: `Welcome back ${user.name.first} 👋`,
-    });
+    // sendPushNotification([{ publicId: publicId }], {
+    //   body: `Hi there, We missed you and your creative culinary skills, Great to have you back,\nLets get cooking 🍱`,
+    //   title: `Welcome back ${user.name.first} 👋`,
+    // });
 
-    if (user.publicIds !== [] || user.publicIds !== null) {
-      sendPushNotification(user.publicIds, {
-        body: `Hi there, We Got a new sign in from your account on another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
-        title: `New Sign in on a new device`,
-      });
-    }
+    // if (user.publicIds !== [] || user.publicIds !== null) {
+    //   sendPushNotification(user.publicIds, {
+    //     body: `Hi there, We Got a new sign in from your account on another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
+    //     title: `New Sign in on a new device`,
+    //   });
+    // }
 
-    user.publicIds = user.publicIds.concat({ publicId: publicId, relatedToken: token });
+    // user.publicIds = user.publicIds.concat({ publicId: publicId, relatedToken: token });
 
     await user.save();
   } catch (e) {

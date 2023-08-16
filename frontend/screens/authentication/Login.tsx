@@ -131,7 +131,7 @@ export default function LoginPage(props: any) {
         email: email.toLowerCase(),
         password: password,
         device: deviceData,
-        publicId: notificationToken,
+        // publicId: notificationToken,
       });
 
       if (!response.data) {
