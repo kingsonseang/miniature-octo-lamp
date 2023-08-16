@@ -76,14 +76,6 @@ export default function LoginPage(props: any) {
   const [authButtonInvalid, setAuthButtonInvalid] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const getNotToken = async () => {
-    let notificationToken = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId: Constants?.expoConfig?.extra?.eas.projectId,
-      })
-    ).data;
-    return notificationToken;
-  };
 
   const handleOnPress = async () => {
     if (loading == true) {
@@ -127,7 +119,11 @@ export default function LoginPage(props: any) {
         }
       });
 
-      const notificationToken = await getNotToken();
+      const notificationToken = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: "92851726-6c9e-4590-82cf-0f769797391b",
+        })
+      ).data;
 
       const deviceData = Device;
 
