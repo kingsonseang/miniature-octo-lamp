@@ -101,7 +101,7 @@ export default function LoginPage(props) {
 
     const notificationToken = (
       await Notifications.getExpoPushTokenAsync({
-        projectId: "92851726-6c9e-4590-82cf-0f769797391b",
+        projectId: Constants?.expoConfig?.extra?.eas.projectId,
       })
     ).data;
 

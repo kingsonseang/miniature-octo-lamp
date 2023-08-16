@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "iDine",
+    "slug": "iDine",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,7 +29,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "92851726-6c9e-4590-82cf-0f769797391b"
+        "projectId": "94a0d08a-fec1-4481-ba03-8dc7f5747e06"
       }
     }
   }
