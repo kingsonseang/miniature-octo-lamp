@@ -20,7 +20,7 @@ import { CommonActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../constants/colors";
 
-export default function Login(props: any) {
+export default function LoginPage(props: any) {
   const {
     navigation,
     route: {
