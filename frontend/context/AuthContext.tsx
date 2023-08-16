@@ -59,6 +59,8 @@ type AuthContextType = {
     otp: string | number,
     password: string
   ) => Promise<boolean | ApiResponse | undefined>;
+  setUserToken: any;
+  setUserData: any;
 };
 
 type ApiResponse = {
@@ -202,6 +204,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
     } else {
       setUserToken(token || null);
       setUserData(null); // Set user data to null if it's not a valid object
+      await AsyncStorage.multiRemove(["userToken", "userData", "Visibility"]);
     }
 
     return !!token;
@@ -222,6 +225,8 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
 
   // loggin user
   const Login = async (token: string, userdata: any) => {
+    await AsyncStorage.multiRemove(["userToken", "userData", "Visibility"]);
+
     await checkConnectivity();
 
     if (isConnected === false) {
@@ -514,6 +519,8 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
       value={{
         userToken,
         userData,
+        setUserToken, 
+        setUserData,
         isAuthenticated,
         Register,
         Login,

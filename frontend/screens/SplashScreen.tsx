@@ -27,14 +27,14 @@ export default function SplashScreenStack() {
 }
 
 function SplashScreen({ navigation }: { navigation: any }) {
-    const { userToken }: any = useContext(AuthContext);
+    const { userToken, isAuthenticated }: any = useContext(AuthContext);
   const animation = useRef(null);
 
   useEffect(() => {
     setTimeout(async () => {
-        let token = await AsyncStorage.getItem("userToken");
+        const isAuth = await isAuthenticated()
 
-        token === null || userToken === "" ? navigation.replace("Authentication") : navigation.replace("AppScreens")
+        !isAuth ? navigation.replace("Authentication") : navigation.replace("AppScreens")
         
     }, 5000);
   }, []);

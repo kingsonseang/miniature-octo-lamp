@@ -25,34 +25,16 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type ApiResponse = {
-  error: boolean;
-  message: string;
-  emailVerified: boolean;
-  token: string;
-  user?: any;
-  // Add other properties if needed
-};
-
-export default function LoginPage(props: any) {
+export default function LoginPage(props) {
   const {
     navigation,
     route: { params },
   } = props;
 
-  const authContext = useContext(AuthContext);
-
-  if (!authContext) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="small" color="#000000" />
-      </View>
-    );
-  }
-
-  const { Login } = authContext;
-
+  const { setUserToken, setUserData } = useContext(AuthContext)
+  
   const navigation1 = useNavigation();
 
   const goBackToInitialRoute = () => {
@@ -64,13 +46,13 @@ export default function LoginPage(props: any) {
     );
   };
 
-  const emailInputRef = useRef<TextInput | null>(null);
+  const emailInputRef = useRef(null);
   const [emailErr, setEmailErr] = useState(false);
   const [email, setEmail] = useState(
     params?.resetPasswordEmail ? params.resetPasswordEmail : ""
   );
   const [obscure, setObscure] = useState(true);
-  const passwordInputRef = useRef<TextInput | null>(null);
+  const passwordInputRef = useRef(null);
   const [password, setPassword] = useState("");
   const [passwordErr, setPasswordErr] = useState(false);
   const [authButtonInvalid, setAuthButtonInvalid] = useState(false);
@@ -125,12 +107,13 @@ export default function LoginPage(props: any) {
 
     const deviceData = Device;
 
-    const response = await axios
-      .post<any>("https://miniture-octo-lamp.onrender.com/api/auth/login", {
+    try {
+      await api
+      .post("http://miniture-octo-lamp.onrender.com/api/auth/login", {
         email: email.toLowerCase(),
         password: password,
-        // device: deviceData,
-        // publicId: notificationToken,
+        device: deviceData,
+        publicId: notificationToken,
       })
       .then(async (response) => {
         if (!response.data) {
@@ -174,12 +157,19 @@ export default function LoginPage(props: any) {
           return;
         }
 
-        const loggedIn = await Login(response.data?.token, response.data?.user);
+        await AsyncStorage.setItem("userToken", response.data?.token);
+        setUserToken(response.data?.token);
+        await AsyncStorage.setItem("userData", JSON.stringify(response.data?.user));
+        setUserData(response.data?.user);
 
-        if (loggedIn) {
-          return goBackToInitialRoute();
-        }
+        return goBackToInitialRoute();
       });
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      setAuthButtonInvalid(false)
+      alert("an error occured")
+    }
   };
 
   return (
