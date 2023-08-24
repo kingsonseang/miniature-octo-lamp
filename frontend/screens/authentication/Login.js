@@ -103,14 +103,6 @@ export default function LoginPage(props) {
 
     alert(`${projectId}`)
 
-    const tokenObject = await Notifications.getExpoPushTokenAsync({
-      projectId: projectId,
-    });
-
-    const notificationToken = tokenObject.data;
-
-    alert(`${notificationToken}`)
-
     const deviceData = await {
       brand: Device.brand,
       productName: Device.productName,
@@ -123,7 +115,6 @@ export default function LoginPage(props) {
           email: email.toLowerCase(),
           password: password,
           device: deviceData,
-          publicId: notificationToken,
         })
         .then(async (response) => {
           if (!response.data) {
