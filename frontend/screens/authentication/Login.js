@@ -33,8 +33,8 @@ export default function LoginPage(props) {
     route: { params },
   } = props;
 
-  const { setUserToken, setUserData } = useContext(AuthContext)
-  
+  const { setUserToken, setUserData } = useContext(AuthContext);
+
   const navigation1 = useNavigation();
 
   const goBackToInitialRoute = () => {
@@ -95,80 +95,89 @@ export default function LoginPage(props) {
 
     await NetInfo.addEventListener((state) => {
       if (state.isConnected === false) {
-        return alert("You arent connected to the internet");
+        return alert("You aren't connected to the internet");
       }
     });
 
-    const notificationToken = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId: Constants?.expoConfig?.extra?.eas.projectId,
-      })
-    ).data;
+    const projectId = await Constants?.expoConfig?.extra?.eas.projectId;
 
-    const deviceData = Device;
+    const tokenObject = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId,
+    });
+
+    const notificationToken = tokenObject.data;
+
+    const deviceData = await {
+      brand: Device.brand,
+      productName: Device.productName,
+      modelName: Device.modelName,
+    };
 
     try {
       await api
-      .post("http://miniture-octo-lamp.onrender.com/api/auth/login", {
-        email: email.toLowerCase(),
-        password: password,
-        device: deviceData,
-        publicId: notificationToken,
-      })
-      .then(async (response) => {
-        if (!response.data) {
-          alert("An error occurred");
-          setAuthButtonInvalid(false);
-          setLoading(false);
-          setAuthButtonInvalid(false);
-          return;
-        }
+        .post("/auth/login", {
+          email: email.toLowerCase(),
+          password: password,
+          device: deviceData,
+          publicId: notificationToken,
+        })
+        .then(async (response) => {
+          if (!response.data) {
+            alert("An error occurred");
+            setAuthButtonInvalid(false);
+            setLoading(false);
+            setAuthButtonInvalid(false);
+            return;
+          }
 
-        console.log(response.data);
+          console.log(response.data);
 
-        if (
-          response.data?.error === true ||
-          response.data?.emailVerified === false
-        ) {
-          alert(response.data?.message);
-          setAuthButtonInvalid(false);
-          setLoading(false);
-          setAuthButtonInvalid(!response.data?.error);
-          return;
-        }
+          if (
+            response.data?.error === true ||
+            response.data?.emailVerified === false
+          ) {
+            alert(response.data?.message);
+            setAuthButtonInvalid(false);
+            setLoading(false);
+            setAuthButtonInvalid(!response.data?.error);
+            return;
+          }
 
-        if (
-          response.data?.error === false ||
-          response.data?.emailVerified === false
-        ) {
-          setAuthButtonInvalid(false);
-          setLoading(false);
-          setAuthButtonInvalid(false);
+          if (
+            response.data?.error === false ||
+            response.data?.emailVerified === false
+          ) {
+            setAuthButtonInvalid(false);
+            setLoading(false);
+            setAuthButtonInvalid(false);
 
-          // send user to otp page
-          return navigation.navigate("Otp", { email: email.toLowerCase() });
-        }
+            // send user to otp page
+            return navigation.navigate("Otp", { email: email.toLowerCase() });
+          }
 
-        if (response.data?.error) {
-          setAuthButtonInvalid(false);
-          setLoading(false);
-          setAuthButtonInvalid(!response.data?.error);
-          alert("An error occurred");
-          return;
-        }
+          if (response.data?.error) {
+            setAuthButtonInvalid(false);
+            setLoading(false);
+            setAuthButtonInvalid(!response.data?.error);
+            alert("An error occurred");
+            return;
+          }
 
-        await AsyncStorage.setItem("userToken", response.data?.token);
-        setUserToken(response.data?.token);
-        await AsyncStorage.setItem("userData", JSON.stringify(response.data?.user));
-        setUserData(response.data?.user);
+          await AsyncStorage.setItem("userToken", response.data?.token);
+          setUserToken(response.data?.token);
+          await AsyncStorage.setItem(
+            "userData",
+            JSON.stringify(response.data?.user)
+          );
+          setUserData(response.data?.user);
 
-        return goBackToInitialRoute();
-      });
+          return goBackToInitialRoute();
+        });
     } catch (error) {
-      console.error(error)
-      setLoading(false)
-      setAuthButtonInvalid(false)
-      alert("an error occured")
+      console.error(error);
+      setLoading(false);
+      setAuthButtonInvalid(false);
+      alert("an error occured");
     }
   };
 

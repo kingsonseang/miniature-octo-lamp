@@ -1,4 +1,5 @@
-import { View, Text, Keyboard, Pressable, Dimensions, SafeAreaView, TextInput, ActivityIndicator } from 'react-native'
+import { View, Text, Keyboard, Pressable, Dimensions, TextInput, ActivityIndicator } from 'react-native'
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useContext, useRef, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import styles from './styles';
@@ -88,7 +89,7 @@ export default function Reset(props: any) {
           >
             <AntDesign name="arrowleft" size={24} color="black" />
           </Pressable>
-          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>Login</Text>
+          <Text allowFontScaling style={[styles.textmP, styles.fs20]}>Reset Password</Text>
           <View style={styles.headerbtn} />
         </View>
 

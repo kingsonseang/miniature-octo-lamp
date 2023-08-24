@@ -1,4 +1,4 @@
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, Platform } from "react-native";
 import React, { useContext, useEffect, useRef } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppScreens from "./app";
@@ -17,6 +17,7 @@ export default function SplashScreenStack() {
       initialRouteName="Onboarding"
       screenOptions={{
         headerShown: false,
+        animation: "fade_from_bottom"
       }}
     >
       <Stack.Screen name="SplashScreen" component={SplashScreen} />
@@ -27,15 +28,16 @@ export default function SplashScreenStack() {
 }
 
 function SplashScreen({ navigation }: { navigation: any }) {
-    const { userToken, isAuthenticated }: any = useContext(AuthContext);
+  const { userToken, isAuthenticated }: any = useContext(AuthContext);
   const animation = useRef(null);
 
   useEffect(() => {
     setTimeout(async () => {
-        const isAuth = await isAuthenticated()
+      const isAuth = await isAuthenticated();
 
-        !isAuth ? navigation.replace("Authentication") : navigation.replace("AppScreens")
-        
+      !isAuth
+        ? navigation.replace("Authentication")
+        : navigation.replace("AppScreens");
     }, 5000);
   }, []);
 
@@ -52,12 +54,20 @@ function SplashScreen({ navigation }: { navigation: any }) {
       <LottieView
         autoPlay
         ref={animation}
-        style={{
-          width: Dimensions.get("window").width,
-          height: Dimensions.get("window").width,
-          backgroundColor: "#fff",
-          transform: [{ scale: 1.5 }],
-        }}
+        style={[
+          {
+            width:
+              Platform.OS === "android"
+                ? Dimensions.get("window").width
+                : Dimensions.get("window").width * 0.5,
+            height:
+              Platform.OS === "android"
+                ? Dimensions.get("window").width
+                : Dimensions.get("window").width * 0.5,
+            backgroundColor: "#fff",
+          },
+          Platform.OS === "android" ? { transform: [{ scale: 1.5 }] } : null,
+        ]}
         // Find more Lottie files at https://lottiefiles.com/featured
         source={require("../assets/splash_animation.json")}
       />
