@@ -101,11 +101,15 @@ export default function LoginPage(props) {
 
     const projectId = await Constants?.expoConfig?.extra?.eas.projectId;
 
+    alert(`${projectId}`)
+
     const tokenObject = await Notifications.getExpoPushTokenAsync({
       projectId: projectId,
     });
 
     const notificationToken = tokenObject.data;
+
+    alert(`${notificationToken}`)
 
     const deviceData = await {
       brand: Device.brand,
