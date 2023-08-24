@@ -110,10 +110,7 @@ const NotificationProvider = ({ children }) => {
           // This listener is fired whenever a notification is received while the app is foregrounded
           notificationListener.current =
             Notifications.addNotificationReceivedListener((notification) => {
-              console.log("--- notification received ---");
-              console.log(notification);
-              console.log("------");
-              increaseBadgeCount();
+              // --- notification received ---
             });
 
           // This listener is fired whenever a user taps on or interacts with a notification
@@ -121,8 +118,7 @@ const NotificationProvider = ({ children }) => {
           responseListener.current =
             Notifications.addNotificationResponseReceivedListener(
               (response) => {
-                decreaseBadgeCount();
-
+                // decreaseBadgeCount();
                 const screenToOpen =
                   response.notification.request.content.data.screenToOpen;
 
@@ -132,7 +128,7 @@ const NotificationProvider = ({ children }) => {
               }
             );
         } catch (error) {
-          console.log("Error setting up notification listeners:", error);
+          console.error("Error setting up notification listeners:", error);
         }
       }
     });
@@ -153,9 +149,7 @@ const NotificationProvider = ({ children }) => {
       "/users/set-push-token",
       { newPublicId: token },
       { headers: { Authorization: `Bearer ${userToken}` } }
-    ).then((res)=>{
-      console.log(res.status);
-    })
+    );
   };
 
   useEffect(() => {
