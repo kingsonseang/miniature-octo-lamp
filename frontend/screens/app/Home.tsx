@@ -222,7 +222,7 @@ export default function Home({ navigation }: any) {
 
     await recipeApi
       .get<ApiResponseType>(
-        `complexSearch?apiKey=f7debcf8fd754900b4dd27598c706bc2&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(
+        `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(
           ", "
         )}&diet=${diet.join(", ")}&intolerances=${allergens.join(", ")}`
       )
@@ -558,7 +558,7 @@ export default function Home({ navigation }: any) {
                 },
               ]}
             >
-              Something went wrong on our end, we're fixing it your meals will
+              Something went wrong on our end, we're fixing it and your meals will
               be back in a few!
             </Text>
           </View>

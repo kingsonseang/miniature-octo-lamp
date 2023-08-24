@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#F0F5F1"
       },
       "package": "com.kingsonseang.black_bento_v1"
     },
@@ -32,5 +32,9 @@
         "projectId": "94a0d08a-fec1-4481-ba03-8dc7f5747e06"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-3290227468881969~6383131517",
+    "ios_app_id": "ca-app-pub-3290227468881969~5843279307"
   }
 }
