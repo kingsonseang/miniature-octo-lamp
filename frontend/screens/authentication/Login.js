@@ -174,7 +174,6 @@ export default function LoginPage(props) {
           return goBackToInitialRoute();
         });
     } catch (error) {
-      console.error(error);
       setLoading(false);
       setAuthButtonInvalid(false);
       alert("an error occured");
