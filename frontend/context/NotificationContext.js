@@ -154,7 +154,7 @@ const NotificationProvider = ({ children }) => {
       { newPublicId: token },
       { headers: { Authorization: `Bearer ${userToken}` } }
     ).then((res)=>{
-      console.log(res.data);
+      console.log(res.status);
     })
   };
 

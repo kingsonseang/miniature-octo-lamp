@@ -101,8 +101,6 @@ export default function LoginPage(props) {
 
     const projectId = await Constants?.expoConfig?.extra?.eas.projectId;
 
-    alert(`${projectId}`)
-
     const deviceData = await {
       brand: Device.brand,
       productName: Device.productName,
@@ -124,9 +122,7 @@ export default function LoginPage(props) {
             setAuthButtonInvalid(false);
             return;
           }
-
-          console.log(response.data);
-
+          
           if (
             response.data?.error === true ||
             response.data?.emailVerified === false

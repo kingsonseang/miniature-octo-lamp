@@ -64,8 +64,8 @@ router.get('/:id', auth, async (req, res) => {
 router.patch('/me/profle_prictue', auth, async (req, res) => {
   try {
     const { user, body } = req;
-    
-    user.profile_picture = body.image
+
+    user.profile_picture = body.image;
 
     await user.save();
 
@@ -219,8 +219,6 @@ router.post('/set-push-token', auth, async (req, res) => {
     token,
   } = req;
 
-  console.log(token, user, newPublicId);
-
   user.publicIds = user.publicIds.filter(publicId => {
     return publicId.relatedToken !== token;
   });
@@ -229,7 +227,7 @@ router.post('/set-push-token', auth, async (req, res) => {
 
   await user.save();
 
-  res.status(201).send();
+  res.status(200).send();
 });
 
 /**
@@ -269,7 +267,7 @@ router.post('/recipe/check-like', auth, async (req, res) => {
     user,
   } = req;
 
-  const isLiked = await user.liked.some(item => item.id === targetId);;
+  const isLiked = await user.liked.some(item => item.id === targetId);
 
   console.log(isLiked);
 
@@ -286,7 +284,6 @@ router.post('/recipe/cook', auth, async (req, res) => {
     body: { recipe },
     user,
   } = req;
-
 
   user.cooked.push(recipe);
 
