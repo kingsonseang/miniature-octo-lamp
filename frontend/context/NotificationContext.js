@@ -6,6 +6,7 @@ import { AuthContext } from "./AuthContext";
 import NetInfo from "@react-native-community/netinfo";
 import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
+import api from "../utils/api";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -65,8 +66,7 @@ const NotificationProvider = ({ children }) => {
           projectId: Constants.expoConfig.extra.eas.projectId,
         })
       ).data;
-      console.log(token);
-      console.log(Device.brand, Device.designName, Device.modelName);
+      setUpServerNotification(token);
     } else {
       alert("Must use physical device for Push Notifications");
       throw new Error("Physical device required for Push Notifications");
@@ -152,6 +152,16 @@ const NotificationProvider = ({ children }) => {
       },
       trigger: trigger,
     });
+  };
+
+  const setUpServerNotification = (token) => {
+    api.put(
+      "/user/set-notfication-token",
+      { token: token },
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    ).then((res)=>{
+      console.log(res.data);
+    })
   };
 
   useEffect(() => {
