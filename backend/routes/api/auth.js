@@ -272,13 +272,13 @@ router.post('/reset/otp', async (req, res) => {
   await otp.save();
   res.status(200).send({ error: false, message: 'Otp sent successfully' });
 
-  if (user.publicIds !== [] || user.publicIds !== null) {
-    sendPushNotification(user.publicIds, {
-      body: `Hi there, We Got a new sign in attempt from another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
-      title: `Sign in attempt`,
-      subtitle: ``,
-    });
-  }
+  // if (user.publicIds !== [] || user.publicIds !== null) {
+  //   sendPushNotification(user.publicIds, {
+  //     body: `Hi there, We Got a new sign in attempt from another device, if this wasn't you please reset your password and let's get back to cooking\n🍙🍱🍚🍣🍲🍝🍜`,
+  //     title: `Sign in attempt`,
+  //     subtitle: ``,
+  //   });
+  // }
 });
 
 /**
