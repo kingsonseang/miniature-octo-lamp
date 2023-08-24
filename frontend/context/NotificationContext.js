@@ -149,9 +149,9 @@ const NotificationProvider = ({ children }) => {
   };
 
   const setUpServerNotification = (token) => {
-    api.put(
-      "/user/set-notfication-token",
-      { token: token },
+    api.post(
+      "/users/set-push-token",
+      { newPublicId: token },
       { headers: { Authorization: `Bearer ${userToken}` } }
     ).then((res)=>{
       console.log(res.data);
