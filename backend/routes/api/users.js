@@ -219,17 +219,20 @@ router.post('/set-push-token', auth, async (req, res) => {
     token,
   } = req;
 
-  console.log(token, user, newPublicId);
+  // Check if there's an existing public ID associated with the provided token
+  const existingPublicId = user.publicIds.find(item => item.relatedToken === token);
 
-  user.publicIds = user.publicIds.filter(publicId => {
-    return publicId.relatedToken !== token;
-  });
+  if (existingPublicId) {
+    // If found, replace the public ID
+    existingPublicId.publicId = newPublicId;
+  } else {
+    // If not found, add a new entry
+    user.publicIds.push({ publicId: newPublicId, relatedToken: token });
+  }
 
-  user.publicIds.concat({ publicId: newPublicId, relatedToken: token });
+  res.status(200);
 
   await user.save();
-
-  res.status(201).send();
 });
 
 /**
@@ -290,35 +293,6 @@ router.post('/recipe/cook', auth, async (req, res) => {
   user.cooked.push(recipe);
 
   res.status(201).send({ cooked: true });
-
-  await user.save();
-});
-
-/**
- * @route   Notification token /user/set-notfication-token
- * @desc    Add liked recipe
- * @access  Private
- */
-router.put('/set-notfication-token', auth, async (req, res) => {
-  const {
-    body: { token },
-    user,
-  } = req;
-
-  const reqToken = req.header('Authorization').replace('Bearer ', '');
-
-  // Check if there's an existing public ID associated with the provided token
-  const existingPublicId = user.publicIds.find(item => item.relatedToken === reqToken);
-
-  if (existingPublicId) {
-    // If found, replace the public ID
-    existingPublicId.publicId = token;
-  } else {
-    // If not found, add a new entry
-    user.publicIds.push({ publicId: token, relatedToken: reqToken });
-  }
-
-  res.status(200);
 
   await user.save();
 });

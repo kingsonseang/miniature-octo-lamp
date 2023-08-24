@@ -11,12 +11,6 @@ import api from "../utils/api";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-  }),
-});
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
@@ -86,7 +80,7 @@ const NotificationProvider = ({ children }) => {
     }
   };
 
-  const incrementBadgeCount = async () => {
+  const increaseBadgeCount = async () => {
     const newBadgeCount = badgeCount + 1;
     setBadgeCount(newBadgeCount);
     await Notifications.setBadgeCountAsync(newBadgeCount);
@@ -119,7 +113,7 @@ const NotificationProvider = ({ children }) => {
               console.log("--- notification received ---");
               console.log(notification);
               console.log("------");
-              incrementBadgeCount();
+              increaseBadgeCount();
             });
 
           // This listener is fired whenever a user taps on or interacts with a notification

@@ -189,11 +189,28 @@ export default function Home({ navigation }: any) {
   };
 
   function getRandomNumber() {
-    const min = 30;
-    const max = 86;
+    const min = 54;
+    const max = 98;
     const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
     return randomNumber;
   }
+
+  // Function to shuffle an array using Fisher-Yates algorithm
+  const shuffleArray = (array: any) => {
+    if (!array) {
+      return;
+    }
+
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
+    }
+    return shuffledArray;
+  };
 
   async function getData() {
     const randomNum = await getRandomNumber();
@@ -205,12 +222,12 @@ export default function Home({ navigation }: any) {
 
     await recipeApi
       .get<ApiResponseType>(
-        `complexSearch?apiKey=6d2604515554406a9bc1857bbfd62e18&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(
+        `complexSearch?apiKey=f7debcf8fd754900b4dd27598c706bc2&includeNutrition=true&instructionsRequired=true&addRecipeInformation=true&number=${randomNum}&type=${type}&cuisine=${cuisine.join(
           ", "
         )}&diet=${diet.join(", ")}&intolerances=${allergens.join(", ")}`
       )
       .then((res) => {
-        setPageData(res.data?.results);
+        setPageData(shuffleArray(res.data?.results));
       });
   }
 
@@ -238,7 +255,7 @@ export default function Home({ navigation }: any) {
         )}&diet=${diet.join(", ")}&intolerances=${allergens.join(", ")}`
       )
       .then((res) => {
-        setPageData(res.data?.results);
+        setPageData(shuffleArray(res.data?.results));
       });
     setLoading(false);
   };
@@ -246,7 +263,9 @@ export default function Home({ navigation }: any) {
   // search
   const [searchTerm, setSearchTerm] = useState<string>("");
   const handleSearch = () => {
-    navigation.navigate("Search", { searchTerm: searchTerm });
+    if (searchTerm.length > 3) {
+      navigation.navigate("Search", { searchTerm: searchTerm });
+    }
   };
 
   return (
@@ -261,11 +280,7 @@ export default function Home({ navigation }: any) {
           <RefreshControl
             refreshing={loading}
             onRefresh={handleRefresh}
-            colors={[
-              colors.buttonColor,
-              colors.red,
-              colors.tetiaryColor,
-            ]}
+            colors={[colors.buttonColor, colors.red, colors.tetiaryColor]}
             style={{
               backgroundColor: colors.buttonColor,
             }}

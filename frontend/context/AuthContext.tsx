@@ -12,9 +12,7 @@ type AuthContextType = {
   userToken: string | null;
   userData: any;
   isAuthenticated: () => Promise<boolean>;
-  Login: (
-    token: string, userdata: any
-  ) => Promise<boolean | undefined>;
+  Login: (token: string, userdata: any) => Promise<boolean | undefined>;
   Register: (
     email: string,
     password: string,
@@ -235,7 +233,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
     }
 
     if (!token || !userdata) {
-      return undefined
+      return undefined;
     }
 
     await AsyncStorage.setItem("userToken", token);
@@ -243,7 +241,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
     await AsyncStorage.setItem("userData", JSON.stringify(userdata));
     setUserData(userdata);
 
-    return true
+    return true;
   };
 
   // register user
@@ -361,14 +359,33 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
 
-      await AsyncStorage.setItem(
-        "userData",
-        JSON.stringify(response?.data?.user)
-      );
-      setUserData(response?.data?.user);
-      setDiet(response?.data?.user?.diet);
-      setCuisine(response?.data?.user?.cuisine);
-      setAllergens(response?.data?.user?.intolerances);
+      if (response?.data?.error === true) {
+        alert(response?.data?.message);
+        return;
+      }
+
+      if (userData === response?.data?.user) {
+        console.log("hello there");
+        
+        await AsyncStorage.setItem(
+          "userData",
+          JSON.stringify(response?.data?.user)
+        );
+
+        setUserData(response?.data?.user);
+
+        if (diet !== response?.data?.user?.diet) {
+          setDiet(response?.data?.user?.diet);
+        }
+        
+        if (cuisine !== response?.data?.user?.cuisine) {
+          setCuisine(response?.data?.user?.cuisine);
+        }
+        
+        if (allergens !== response?.data?.user?.intolerances) {
+          setAllergens(response?.data?.user?.intolerances);
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -519,7 +536,7 @@ const AuthProvider: React.FC<{ children: React.ReactElement }> = ({
       value={{
         userToken,
         userData,
-        setUserToken, 
+        setUserToken,
         setUserData,
         isAuthenticated,
         Register,

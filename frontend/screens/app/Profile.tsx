@@ -9,6 +9,8 @@ import {
   ScrollView,
   Keyboard,
   StyleSheet,
+  ToastAndroid,
+  Platform,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
@@ -64,9 +66,9 @@ export default function Profile() {
 
   useEffect(() => {
     async function gettingAccurate() {
-      setLoading(true);
+      Platform.OS === "android" ? ToastAndroid.show("fetching user preferences", 5000) : setLoading(true)
       await getUpdatedUserDetails();
-      setLoading(false);
+      Platform.OS === "android" ? ToastAndroid.show("User preferences updated sucessfully", 5000) : setLoading(false)
     }
     gettingAccurate();
   }, []);
